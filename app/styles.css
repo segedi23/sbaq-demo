@@ -326,3 +326,7 @@ td.act { white-space: nowrap; }
   border-radius: 3px; padding: 7px 9px; font-size: 14px; font-family: inherit; resize: vertical; }
 .fld textarea:focus { border-color: var(--teal); outline: none; }
 .skip-reason[hidden] { display: none; }
+
+/* link back to the landing page from the app logo */
+a.logo { text-decoration: none; }
+a.logo:hover { color: #8bc0b2; }

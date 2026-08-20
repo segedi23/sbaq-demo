@@ -3,32 +3,305 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SBAQ Testialusta (demo)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>SBAQ, urheilijan testitulosten seuranta</title>
+  <meta name="description" content="SBAQ on työkalu jääkiekkoilijoiden fyysisten testitulosten syöttöön, seurantaan ja vertailuun. Speed, Balance, Agility, Quickness." />
+  <link rel="stylesheet" href="site.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">
       <span class="logo">SBAQ</span>
       <span class="tag">Speed · Balance · Agility · Quickness</span>
-    </div>
-    <nav class="tabs" id="tabs">
-      <button data-view="roster" class="active">Pelaajat</button>
-      <button data-view="compare">Vertailu</button>
+    </a>
+    <nav class="sitenav">
+      <a href="#palvelu" class="hide-sm">Palvelu</a>
+      <a href="#testit" class="hide-sm">Testit</a>
+      <a href="#nain-se-toimii" class="hide-sm">Näin se toimii</a>
+      <a href="#yhteys" class="hide-sm">Yhteys</a>
+      <a href="app/" class="btn btn-primary">Avaa työkalu</a>
     </nav>
-    <div class="rolebox">
-      <label>Rooli</label>
-      <select id="roleSelect" title="Demo: vaihda roolia (ylläpitäjä näkee kaiken, pelaaja vain omansa)"></select>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ---------- hero ---------- -->
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Fyysisen testauksen seurantatyökalu</span>
+      <h1>Testitulokset, jotka <em>kertovat kehityksestä</em></h1>
+      <p class="lead">
+        Seurat testaavat pelaajansa vuosittain. Tulokset päätyvät Excel-tiedostoihin,
+        jotka unohtuvat kansioihin. SBAQ kerää ne yhteen paikkaan ja näyttää mitä
+        ne todella tarkoittavat: miten pelaaja on kehittynyt, miten hän sijoittuu
+        omaan sarjaansa, ja mihin harjoittelu kannattaa suunnata.
+      </p>
+      <div class="cta-row">
+        <a href="app/" class="btn btn-primary">Avaa työkalu</a>
+        <a href="#palvelu" class="btn btn-ghost">Lue lisää</a>
+        <span class="cta-note">Toimii selaimessa, ei asennusta</span>
+      </div>
+
+      <div class="sbaq-row">
+        <div class="sbaq-item">
+          <div class="letter">S</div>
+          <div class="word">Speed</div>
+          <p>Maksiminopeus. 30 metrin juoksu ajanotolla.</p>
+        </div>
+        <div class="sbaq-item">
+          <div class="letter">B</div>
+          <div class="word">Balance</div>
+          <p>Tasapaino ja hallinta. Y-tasapainotesti, puolierot.</p>
+        </div>
+        <div class="sbaq-item">
+          <div class="letter">A</div>
+          <div class="word">Agility</div>
+          <p>Ketteryys. 505-testi molemmille puolille erikseen.</p>
+        </div>
+        <div class="sbaq-item">
+          <div class="letter">Q</div>
+          <div class="word">Quickness</div>
+          <p>Räjähtävyys. 10 metrin kiihdytys ja hyppytestit.</p>
+        </div>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <main id="app"></main>
+  <!-- ---------- ongelma / ratkaisu ---------- -->
+  <section id="palvelu">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Miksi</div>
+        <h2>Testaaminen on helppoa. Tulosten hyödyntäminen ei.</h2>
+        <p>
+          Yksittäinen testipäivä kertoo vähän. Arvo syntyy siitä, että sama pelaaja
+          mitataan uudelleen vuoden päästä ja lukuja verrataan johonkin mielekkääseen.
+        </p>
+      </div>
+      <div class="split">
+        <div class="panel before">
+          <h3>Ilman työkalua</h3>
+          <ul>
+            <li>Tulokset hajallaan Exceleissä, papereilla ja valmentajien puhelimissa.</li>
+            <li>Vertailukohtaa ei ole: onko 4,20 sekuntia hyvä 16-vuotiaalta U18-pelaajalta?</li>
+            <li>Kasvupyrähdys tai loukkaantuminen selittää notkahduksen, mutta sitä ei ole kirjattu mihinkään.</li>
+            <li>Pelaaja ei näe omaa kehitystään, joten testipäivä tuntuu pakolliselta rutiinilta.</li>
+            <li>Kun valmentaja vaihtuu, historia katoaa.</li>
+          </ul>
+        </div>
+        <div class="panel after">
+          <h3>SBAQ:n kanssa</h3>
+          <ul>
+            <li>Kaikki testikerrat samassa paikassa, pelaajakohtaisena aikajanana.</li>
+            <li>Jokainen tulos suhteutetaan siihen sarjaan ja ikään jossa pelaaja silloin oli.</li>
+            <li>Loukkaantumiset, sairastelut ja kasvupyrähdykset merkitään dataan, joten notkahdukset selittyvät.</li>
+            <li>Pelaaja näkee oman kehityskaarensa ja saa tulostettavan analyysin.</li>
+            <li>Historia säilyy seuralla, ei yksittäisellä valmentajalla.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <footer class="foot">
-    Demo · synteettinen data (<span id="pcount"></span> pelaajaa) · numerot lasketaan datasta, eivät ole oikeita henkilöitä
-  </footer>
+  <!-- ---------- ominaisuudet ---------- -->
+  <section class="alt" id="ominaisuudet">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Ominaisuudet</div>
+        <h2>Mitä työkalu tekee</h2>
+        <p>Kaikki numerot lasketaan suoraan syötetystä testidatasta.</p>
+      </div>
+      <div class="grid3">
+        <div class="card">
+          <svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          <h3>Kehityskaari yli ajan</h3>
+          <p>Jokainen testitulos aikajanalla. Piste väritetään sen sarjan mukaan jossa pelaaja kyseisenä päivänä pelasi, ja katkoviiva näyttää oman sarjan keskitason.</p>
+        </div>
+        <div class="card">
+          <svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="8" width="7" height="13" rx="1"/></svg>
+          <h3>Sarjakohtainen vertailu</h3>
+          <p>Tulos verrataan aina siihen sarjatasoon jossa pelaaja silloin pelasi, ei nykyiseen. Näin U18-kaudella tehty aika ei näytä huonolta Liiga-mittapuulla.</p>
+        </div>
+        <div class="card">
+          <svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12h6"/></svg>
+          <h3>Loukkaantumiset ja kasvu</h3>
+          <p>Merkinnät aikajanalla: loukkaantumisjaksot, sairastelut, kasvupyrähdykset ja pelipaikan vaihdot. Konteksti selittää mitä käyrälle tapahtui.</p>
+        </div>
+        <div class="card">
+          <svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
+          <h3>Tulostettava analyysi</h3>
+          <p>Jokaisesta testikerrasta syntyy raportti, joka vertaa edelliseen kertaan ja lähtötasoon, huomioi loukkaantumiset ja antaa harjoitussuositukset.</p>
+        </div>
+        <div class="card">
+          <svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/><path d="M17 11h6"/><path d="M20 8v6"/></svg>
+          <h3>Pelaajien vertailu</h3>
+          <p>Vertaa pelaajaa ikätovereihinsa samalla pelipaikalla ja sarjatasolla, joko hajontakuviona vertailuikänä tai päällekkäisinä kehityskäyrinä.</p>
+        </div>
+        <div class="card">
+          <svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <h3>Roolit ja näkyvyys</h3>
+          <p>Valmentaja ja fysiikkavalmentaja näkevät koko ryhmän ja syöttävät tuloksia. Pelaaja näkee vain omat tuloksensa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <script src="data.js"></script>
-  <script src="main.js"></script>
+  <!-- ---------- testipatteristo ---------- -->
+  <section id="testit">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Testipatteristo</div>
+        <h2>Mitä mitataan</h2>
+        <p>
+          Vakioitu patteristo, joka kattaa nopeuden, voimantuoton, ketteryyden,
+          tasapainon ja liikkuvuuden. Puolierot mitataan erikseen siellä missä
+          ne ovat oleellisia.
+        </p>
+      </div>
+      <div class="grid4">
+        <div class="test"><div class="cat cat-power">Power</div><div class="nm">CMJ</div><div class="un">Kevennyshyppy · cm · myös puolittain</div></div>
+        <div class="test"><div class="cat cat-power">Power</div><div class="nm">Squat Jump</div><div class="un">Staattinen hyppy · cm · myös puolittain</div></div>
+        <div class="test"><div class="cat cat-speed">Speed</div><div class="nm">30 m juoksu</div><div class="un">Maksiminopeus · s</div></div>
+        <div class="test"><div class="cat cat-quick">Quickness</div><div class="nm">10 m kiihdytys</div><div class="un">Lähtökiihtyvyys · s</div></div>
+        <div class="test"><div class="cat cat-agility">Agility</div><div class="nm">505-ketteryys</div><div class="un">Suunnanmuutos · s · oikea ja vasen</div></div>
+        <div class="test"><div class="cat cat-balance">Balance</div><div class="nm">Y-tasapaino</div><div class="un">Komposiittipisteet · %</div></div>
+        <div class="test"><div class="cat cat-mobility">Mobility</div><div class="nm">Nilkan liikkuvuus</div><div class="un">Weight bearing lunge · cm · O/V</div></div>
+        <div class="test"><div class="cat cat-strength">Strength</div><div class="nm">Keiser leg press</div><div class="un">Teho eri kuormilla · W</div></div>
+      </div>
+      <p style="color:var(--muted); font-size:14px; margin-top:20px;">
+        Jokaisella testikerralla kirjataan lisäksi ikä, pituus, paino ja sarjataso,
+        jotta tulokset ovat suhteutettavissa myöhemmin.
+      </p>
+    </div>
+  </section>
+
+  <!-- ---------- näin se toimii ---------- -->
+  <section class="alt" id="nain-se-toimii">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Näin se toimii</div>
+        <h2>Kolme vaihetta</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <h3>Testaa</h3>
+          <p>Seura ajaa oman testipäivänsä normaalisti. SBAQ ei vaadi uusia laitteita, vaan käyttää patteristoa jota seuroissa jo mitataan.</p>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <h3>Syötä</h3>
+          <p>Tulokset kirjataan lomakkeella pelaajakohtaisesti, mukaan pituus, paino ja sen hetkinen sarjataso. Merkinnät loukkaantumisista talletetaan samalla.</p>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <h3>Analysoi</h3>
+          <p>Näkymät päivittyvät heti: kehityskaari, sarjavertailu, SBAQ-suhdeluvut ja tulostettava raportti pelaajalle ja valmentajalle.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- kenelle ---------- -->
+  <section id="kenelle">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Kenelle</div>
+        <h2>Kenelle tämä on tehty</h2>
+        <p>
+          Ensisijaisesti jääkiekkoon, mutta patteristo ja logiikka toimivat missä
+          tahansa lajissa jossa nopeutta, ketteryyttä ja voimantuottoa testataan
+          toistuvasti.
+        </p>
+      </div>
+      <div class="chips">
+        <span class="chip">Jääkiekkoseurat</span>
+        <span class="chip">Urheiluakatemiat</span>
+        <span class="chip">Fysiikkavalmentajat</span>
+        <span class="chip">Fysioterapeutit</span>
+        <span class="chip">Maajoukkuepolut</span>
+        <span class="chip">Yksittäiset pelaajat</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- tilanne ---------- -->
+  <section class="alt" id="tilanne">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Tilanne</div>
+        <h2>Missä mennään</h2>
+        <p>Palvelu on kehitysvaiheessa. Tässä mitä on valmiina ja mitä seuraavaksi.</p>
+      </div>
+      <div class="road">
+        <div class="road-item">
+          <div><span class="pill done">Valmis</span></div>
+          <div>
+            <h3>Selaimessa toimiva työkalu</h3>
+            <p>Pelaajalista, pelaajanäkymä kehityskaarineen, vertailu, tulosten syöttö ja tulostettava raportti. Toimii ilman asennusta ja ilman ulkoisia kirjastoja.</p>
+          </div>
+        </div>
+        <div class="road-item">
+          <div><span class="pill wip">Työn alla</span></div>
+          <div>
+            <h3>Oikea testidata</h3>
+            <p>Seurojen todelliset testitulokset korvaamassa demossa käytettyä synteettistä aineistoa.</p>
+          </div>
+        </div>
+        <div class="road-item">
+          <div><span class="pill next">Seuraavaksi</span></div>
+          <div>
+            <h3>Tallennus ja kirjautuminen</h3>
+            <p>Tietokanta, käyttäjätunnukset ja roolit, jotta seuran data säilyy turvallisesti ja pelaaja näkee vain omansa.</p>
+          </div>
+        </div>
+        <div class="road-item">
+          <div><span class="pill next">Seuraavaksi</span></div>
+          <div>
+            <h3>Viitearvot</h3>
+            <p>Julkaistut normit ja kertyneet kokemusarvot vertailukohdaksi sarjatasoittain ja ikäluokittain.</p>
+          </div>
+        </div>
+        <div class="road-item">
+          <div><span class="pill next">Seuraavaksi</span></div>
+          <div>
+            <h3>AI-avusteinen raportti</h3>
+            <p>Numerot lasketaan datasta, ja kielimalli kirjoittaa niistä valmentajalle ja pelaajalle luettavan tulkinnan ja suositukset.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- yhteys ---------- -->
+  <section id="yhteys">
+    <div class="wrap">
+      <div class="contact-box">
+        <h2>Kiinnostuitko?</h2>
+        <p>
+          Palvelua kehitetään yhdessä seurojen kanssa. Jos haluat kokeilla työkalua
+          oman joukkueesi testituloksilla, ota yhteyttä.
+        </p>
+        <div class="cta-row">
+          <a href="app/" class="btn btn-primary">Avaa työkalu</a>
+          <a href="mailto:janne.seivo@gmail.com" class="btn btn-ghost">Ota yhteyttä</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="logo" style="font-size:16px;">SBAQ</span>
+    <span>Speed · Balance · Agility · Quickness</span>
+    <span class="sep"><a href="app/">Työkalu</a></span>
+    <span><a href="#yhteys">Yhteys</a></span>
+  </div>
+</footer>
+
 </body>
 </html>

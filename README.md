@@ -12,9 +12,9 @@ eivät ole oikeita henkilöitä.
 Riippumaton kaikista kirjastoista. Palvele kansio staattisesti:
 
 ```bash
-cd app
 python3 -m http.server 8199
-# avaa http://localhost:8199
+# esittelysivu:  http://localhost:8199/
+# työkalu:       http://localhost:8199/app/
 ```
 
 (Claude Code: käynnistyy myös `launch.json` konfiguraatiolla `sbaq-demo`.)
@@ -23,9 +23,10 @@ python3 -m http.server 8199
 
 | Tiedosto | Rooli |
 |---|---|
-| `generate.mjs` | Synteettisen datan generaattori (Node). Aja `node generate.mjs`, syntyy `data.js` |
-| `data.js` | Generoitu aineisto (`window.SBAQ_DATA`), 50 pelaajaa, 375 testiä |
-| `index.html`, `styles.css`, `main.js` | Dashboard (lista, pelaajanäkymä, vertailu) |
+| `index.html`, `site.css` | Julkinen esittelysivu (etusivu) |
+| `app/generate.mjs` | Synteettisen datan generaattori (Node). Aja `node app/generate.mjs`, syntyy `app/data.js` |
+| `app/data.js` | Aineisto (`window.SBAQ_DATA`), 50 pelaajaa, 375 testiä |
+| `app/index.html`, `app/styles.css`, `app/main.js` | Dashboard (lista, pelaajanäkymä, vertailu) |
 
 ## Mitä demo näyttää
 
