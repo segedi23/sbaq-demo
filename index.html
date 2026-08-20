@@ -18,7 +18,7 @@
     <nav class="sitenav">
       <a href="#palvelu" class="hide-sm">Palvelu</a>
       <a href="#testit" class="hide-sm">Testit</a>
-      <a href="#nain-se-toimii" class="hide-sm">Näin se toimii</a>
+      <a href="#menetelma" class="hide-sm">Menetelmä</a>
       <a href="#yhteys" class="hide-sm">Yhteys</a>
       <a href="app/" class="btn btn-primary">Avaa työkalu</a>
     </nav>
@@ -48,22 +48,22 @@
         <div class="sbaq-item">
           <div class="letter">S</div>
           <div class="word">Speed</div>
-          <p>Maksiminopeus. 30 metrin juoksu ajanotolla.</p>
+          <p>Elastinen, rytminen nopeus, ei painava voimantuotto.</p>
         </div>
         <div class="sbaq-item">
           <div class="letter">B</div>
           <div class="word">Balance</div>
-          <p>Tasapaino ja hallinta. Y-tasapainotesti, puolierot.</p>
+          <p>Yhden jalan dynaaminen hallinta ja keskivartalon stabiliteetti.</p>
         </div>
         <div class="sbaq-item">
           <div class="letter">A</div>
           <div class="word">Agility</div>
-          <p>Ketteryys. 505-testi molemmille puolille erikseen.</p>
+          <p>Suunnanvaihdot tasapainon säilyttäen.</p>
         </div>
         <div class="sbaq-item">
           <div class="letter">Q</div>
           <div class="word">Quickness</div>
-          <p>Räjähtävyys. 10 metrin kiihdytys ja hyppytestit.</p>
+          <p>Reaktiivinen snap: jalan nopea irtiotto rangan elastisuudella.</p>
         </div>
       </div>
     </div>
@@ -155,30 +155,106 @@
         <div class="kicker">Testipatteristo</div>
         <h2>Mitä mitataan</h2>
         <p>
-          Vakioitu patteristo, joka kattaa nopeuden, voimantuoton, ketteryyden,
-          tasapainon ja liikkuvuuden. Puolierot mitataan erikseen siellä missä
-          ne ovat oleellisia.
+          Testaus toteutetaan yhteistyössä Sport Labin kanssa. Patteristo on
+          rakennettu mittaamaan juuri niitä ominaisuuksia joita SBAQ kehittää:
+          nopeaa voimantuottoa, elastista tehoa ja pelinomaista reagointia.
+          Puolierot mitataan erikseen.
         </p>
       </div>
+
       <div class="grid4">
-        <div class="test"><div class="cat cat-power">Power</div><div class="nm">CMJ</div><div class="un">Kevennyshyppy · cm · myös puolittain</div></div>
-        <div class="test"><div class="cat cat-power">Power</div><div class="nm">Squat Jump</div><div class="un">Staattinen hyppy · cm · myös puolittain</div></div>
-        <div class="test"><div class="cat cat-speed">Speed</div><div class="nm">30 m juoksu</div><div class="un">Maksiminopeus · s</div></div>
-        <div class="test"><div class="cat cat-quick">Quickness</div><div class="nm">10 m kiihdytys</div><div class="un">Lähtökiihtyvyys · s</div></div>
-        <div class="test"><div class="cat cat-agility">Agility</div><div class="nm">505-ketteryys</div><div class="un">Suunnanmuutos · s · oikea ja vasen</div></div>
-        <div class="test"><div class="cat cat-balance">Balance</div><div class="nm">Y-tasapaino</div><div class="un">Komposiittipisteet · %</div></div>
-        <div class="test"><div class="cat cat-mobility">Mobility</div><div class="nm">Nilkan liikkuvuus</div><div class="un">Weight bearing lunge · cm · O/V</div></div>
-        <div class="test"><div class="cat cat-strength">Strength</div><div class="nm">Keiser leg press</div><div class="un">Teho eri kuormilla · W</div></div>
+        <div class="card">
+          <div class="cat cat-strength">01 · Kestävyys</div>
+          <h3>Hapenottokyky</h3>
+          <p>Suora hapenottotesti juoksumatolla hengityskaasuanalyysillä.</p>
+          <ul class="tlist">
+            <li>VO<sub>2</sub>max</li>
+            <li>Kynnykset ja syketasot</li>
+            <li>Harjoittelun tehoalueet</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="cat cat-speed">02 · Nopeus</div>
+          <h3>Kiihdytys, sali ja jää</h3>
+          <p>Valokennomittaus molemmissa ympäristöissä, jotta nähdään siirtyykö teho luisteluun.</p>
+          <ul class="tlist">
+            <li>10 m sprintti, sali</li>
+            <li>20 m luistelukiihdytys, jää</li>
+            <li>Väliajat ja kiihtyvyyskäyrä</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="cat cat-agility">03 · Reaktio ja ketteryys</div>
+          <h3>Pelinomainen reagointi</h3>
+          <p>Valostimuluksiin perustuvat testit suunnanmuutoksista ja reagoinnista.</p>
+          <ul class="tlist">
+            <li>Reaktioaika valoärsykkeeseen</li>
+            <li>505-ketteryystesti</li>
+            <li>Y-testi, monisuuntainen liike</li>
+            <li>Satunnainen reaktiotesti</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="cat cat-power">04 · Voima ja teho</div>
+          <h3>Räjähtävyys ja puolierot</h3>
+          <p>Kuinka paljon voimaa pelaaja tuottaa ja ennen kaikkea kuinka nopeasti.</p>
+          <ul class="tlist">
+            <li>Kevennyshyppy (CMJ) ja Squat Jump</li>
+            <li>Single Leg Snap Drive, teho per jalka</li>
+            <li>Keiser-jalkaprässi, yhdellä ja kahdella</li>
+            <li>Huipputeho ja teho suhteessa painoon</li>
+          </ul>
+        </div>
       </div>
-      <p style="color:var(--muted); font-size:14px; margin-top:20px;">
+
+      <p class="fineprint">
         Jokaisella testikerralla kirjataan lisäksi ikä, pituus, paino ja sarjataso,
-        jotta tulokset ovat suhteutettavissa myöhemmin.
+        jotta tulokset ovat suhteutettavissa myöhemmin. Eri testien lukuja ei
+        verrata ristiin: esimerkiksi Keiser-jalkaprässin W/kg ei ole vertailukelpoinen
+        Wingate-pyörätestin viitearvojen kanssa.
+      </p>
+    </div>
+  </section>
+
+  <!-- ---------- menetelmä ---------- -->
+  <section class="alt" id="menetelma">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Menetelmä</div>
+        <h2>Miksi juuri näitä lukuja seurataan</h2>
+        <p>
+          SBAQ kehittää nopeaa voimantuottoa ja elastista tehoa, ei maksimivoimaa.
+          Siksi seurannan painopiste on tehossa ja sen kehityksessä: maksimivoima voi
+          pysyä paikallaan samalla kun räjähtävyys nousee voimakkaasti. Työkalu on
+          rakennettu näyttämään juuri tämä ero.
+        </p>
+      </div>
+      <div class="grid3">
+        <div class="card">
+          <h3>Liike systeeminä</h3>
+          <p>Keho toimii yhtenä kokonaisuutena, ei erillisinä lihaksina. Voima syntyy keskivartalosta ja siirtyy elastisena ketjuna jalkaan ja jäähän.</p>
+        </div>
+        <div class="card">
+          <h3>Teho ennen massaa</h3>
+          <p>Ensin hermoston kyky käyttää voimaa, vasta sen päälle lisää voimaa ja massaa. Näin uusi lihasmassa on toiminnallista.</p>
+        </div>
+        <div class="card">
+          <h3>Kuormitus on väline</h3>
+          <p>Jaksotettu kuormitus tuottaa väliaikaisia notkahduksia testituloksiin. Kun ne on kirjattu, käyrän muoto on tulkittavissa oikein.</p>
+        </div>
+      </div>
+      <p class="fineprint">
+        Teoreettinen tausta: Spinal Engine (Gracovetsky) · faskiajärjestelmä
+        (Schleip, Myers, Gibbons) · Triphasic Training (Cal Dietz) · plyometria ja SAQ.
       </p>
     </div>
   </section>
 
   <!-- ---------- näin se toimii ---------- -->
-  <section class="alt" id="nain-se-toimii">
+  <section id="nain-se-toimii">
     <div class="wrap">
       <div class="sec-head">
         <div class="kicker">Näin se toimii</div>
@@ -205,7 +281,7 @@
   </section>
 
   <!-- ---------- kenelle ---------- -->
-  <section id="kenelle">
+  <section class="alt" id="kenelle">
     <div class="wrap">
       <div class="sec-head">
         <div class="kicker">Kenelle</div>
@@ -228,7 +304,7 @@
   </section>
 
   <!-- ---------- tilanne ---------- -->
-  <section class="alt" id="tilanne">
+  <section id="tilanne">
     <div class="wrap">
       <div class="sec-head">
         <div class="kicker">Tilanne</div>

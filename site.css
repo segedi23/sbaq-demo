@@ -198,3 +198,13 @@ section.alt { background: #191b21; }
 .foot .sep { margin-left: auto; }
 .foot a { color: var(--muted); }
 .foot a:hover { color: var(--teal); }
+
+/* ---------- test battery cards ---------- */
+.card .cat {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+  font-weight: 700; margin-bottom: 8px;
+}
+ul.tlist { margin: 12px 0 0; padding-left: 18px; }
+ul.tlist li { color: var(--muted); font-size: 14px; margin-bottom: 5px; }
+ul.tlist li:last-child { margin-bottom: 0; }
+.fineprint { color: var(--muted); font-size: 14px; margin: 22px 0 0; max-width: 78ch; }
