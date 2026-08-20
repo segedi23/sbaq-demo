@@ -2,22 +2,38 @@
 /* SBAQ demo dashboard. Dependency-free. Reads window.SBAQ_DATA. */
 
 const D = window.SBAQ_DATA;
+/* The dashboard was built for a synthetic set where every player had an age and
+   a league on every session. Real measurement sheets carry neither, so each
+   view that needs them is gated on these instead of guessing values. */
+const HAS_AGES = D.players.some((p) => p.age != null);
+const HAS_LEAGUES = (D.leagues || []).length > 0 && D.players.some((p) => p.currentLeague != null);
+/* Percentile and league-average comparisons need a population to compare with. */
+const HAS_PEERS = HAS_AGES && HAS_LEAGUES && D.players.length >= 4;
 const $ = (sel, el = document) => el.querySelector(sel);
 const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const YEAR = 365.25 * 86400000;
 
 /* ---------- metric definitions ---------- */
+/* `get` returns null whenever the test was not part of that session, so every
+   view has to cope with gaps: the real battery is not run in full every time. */
+const sideAvg = (o) => (o == null || o.right == null || o.left == null)
+  ? null : Math.round(((o.right + o.left) / 2) * 10) / 10;
 const METRICS = [
-  { code: 'cmj',        label: 'CMJ (kahdella)',        unit: 'cm', hb: true,  get: (s) => s.measurements.cmj.both },
-  { code: 'sj',         label: 'Squat Jump (kahdella)', unit: 'cm', hb: true,  get: (s) => s.measurements.sj.both },
-  { code: 'keiser',     label: 'Keiser teho (kevyt kuorma)', unit: 'W', hb: true, get: (s) => s.measurements.keiser[0].watts },
-  { code: 'sprint30',   label: '30 m juoksu',           unit: 's',  hb: false, get: (s) => s.measurements.sprint30 },
-  { code: 'sprint10',   label: '10 m kiihdytys',        unit: 's',  hb: false, get: (s) => s.measurements.sprint10 },
-  { code: 'agility505', label: '505-ketteryys',         unit: 's',  hb: false, get: (s) => s.measurements.agility505.both },
-  { code: 'ybalance',   label: 'Y-tasapaino',           unit: '%',  hb: true,  get: (s) => s.measurements.ybalance },
-  { code: 'ankle',      label: 'Nilkan liikkuvuus',     unit: 'cm', hb: true,  get: (s) => { const a = s.measurements.ankle; return a.right == null || a.left == null ? null : avg(a.right, a.left); } },
+  { code: 'cmj',       label: 'CMJ (kahdella)',           unit: 'cm',   hb: true, get: (s) => s.measurements.cmj.both },
+  { code: 'sj',        label: 'Squat Jump (kahdella)',    unit: 'cm',   hb: true, get: (s) => s.measurements.sj.both },
+  { code: 'cmj1',      label: 'CMJ (yhdellä, ka)',        unit: 'cm',   hb: true, get: (s) => sideAvg(s.measurements.cmj) },
+  { code: 'sj1',       label: 'Squat Jump (yhdellä, ka)', unit: 'cm',   hb: true, get: (s) => sideAvg(s.measurements.sj) },
+  { code: 'snap',      label: 'Snap Drive (tehohuippu)',  unit: 'W',    hb: true, get: (s) => sideAvg(s.measurements.snap) },
+  { code: 'snapFixed', label: 'Snap Drive (vakiokuorma)', unit: 'W',    hb: true, get: (s) => sideAvg(s.measurements.snapFixed) },
+  { code: 'keiser',    label: 'Keiser-jalkaprässi',       unit: 'W',    hb: true, get: (s) => s.measurements.keiser.watts },
+  { code: 'keiserRel', label: 'Keiser, teho / paino',     unit: 'W/kg', hb: true, get: (s) => s.measurements.keiser.wattsPerKg },
+  { code: 'legPress',  label: 'Leg press (indeksi)',      unit: 'idx',  hb: true, get: (s) => s.measurements.legPress },
 ];
+/* Which metrics any session in the data actually carries. With a real battery
+   most players will not have every test, and empty chips are noise. */
+const metricsPresent = (players) =>
+  METRICS.filter((m) => players.some((p) => p.sessions.some((s) => m.get(s) != null)));
 const metric = (code) => METRICS.find((m) => m.code === code);
 const avg = (a, b) => Math.round(((a + b) / 2) * 10) / 10;
 
@@ -25,8 +41,8 @@ const avg = (a, b) => Math.round(((a + b) / 2) * 10) / 10;
 const parseD = (iso) => new Date(iso + 'T00:00:00Z');
 const fmtD = (iso) => { const d = parseD(iso); return `${d.getUTCDate()}.${d.getUTCMonth() + 1}.${String(d.getUTCFullYear()).slice(2)}`; };
 const fmtDLong = (iso) => { const d = parseD(iso); return `${d.getUTCDate()}.${d.getUTCMonth() + 1}.${d.getUTCFullYear()}`; };
-const num = (v, unit) => v == null ? '-' : Number(v).toFixed(unit === 's' ? 2 : 1);
-const leagueOf = (code) => D.leagues.find((l) => l.code === code);
+const num = (v, unit) => v == null ? '-' : Number(v).toFixed(unit === 's' ? 2 : unit === 'W' ? 0 : 1);
+const leagueOf = (code) => D.leagues.find((l) => l.code === code) || { code, name: code, level: 0 };
 // distinct, clearly separable colour per league
 const LEAGUE_COLORS = {
   'U15-SM': '#9198a6', 'U16-SM': '#8496c2', 'U18-SM': '#7ba4c4', 'U20-SM': '#6bb6c2',
@@ -83,6 +99,7 @@ function diffHtml(now, ref, m) {
    22-year-old contributes the value from when they were the same age. */
 function leaguePeerValues(p, m) {
   const lg = last(p).league;
+  if (!HAS_PEERS) return { values: [], league: lg };
   return { values: matchedValuesAtAgeLeague(p.age, lg, m, p.id), league: lg };
 }
 /* Age-matched comparison set: for every player, the session closest to
@@ -122,7 +139,8 @@ function removeAnnotStore(pid, annId) { const all = loadJSON(ANN_KEY); if (all[p
 function refreshDerived(p) {
   p.sessions.sort((a, b) => parseD(a.date) - parseD(b.date));
   const L = last(p);
-  p.age = L.ageYears; p.currentLeague = L.league; p.heightCm = L.heightCm; p.weightKg = L.weightKg;
+  p.age = L.ageYears; p.currentLeague = L.league;
+  p.heightCm = L.heightCm; p.weightKg = L.weightKg ?? p.weightKg;
 }
 function mergeAll() {
   const added = loadJSON(ADDED_KEY);
@@ -159,6 +177,7 @@ function openReport(pid, sid) { state.view = 'report'; state.playerId = pid; sta
    Wider age window (default ±2.5 v) so the comparison group is big enough for a
    meaningful percentile. */
 function matchedValuesAtAgeLeague(age, league, m, excludeId, tol = 2.5) {
+  if (!HAS_PEERS || age == null || league == null) return [];
   const vals = [];
   for (const q of D.players) {
     if (q.id === excludeId) continue;
@@ -172,7 +191,8 @@ function matchedValuesAtAgeLeague(age, league, m, excludeId, tol = 2.5) {
 function initRole() {
   const sel = $('#roleSelect');
   const injured = D.players.filter((p) => p.annotations.some((a) => a.type === 'injury'));
-  const samples = [injured[0], D.players.find((p) => p.currentLeague === 'NHL' || p.currentLeague === 'AHL'), D.players[0]].filter(Boolean);
+  const samples = [injured[0], D.players.find((p) => p.currentLeague === 'NHL' || p.currentLeague === 'AHL'), D.players[0]]
+    .filter(Boolean).slice(0, 3);
   const opts = ['<option value="admin">Ylläpitäjä (kaikki)</option>'];
   const seen = new Set();
   for (const p of samples) { if (seen.has(p.id)) continue; seen.add(p.id); opts.push(`<option value="player:${p.id}">Pelaaja: ${esc(p.name)}</option>`); }
@@ -205,19 +225,21 @@ function ageBucket(age) { return age < 15 ? '12-14' : age < 17 ? '15-16' : age <
 
 function renderRoster() {
   const wrap = el('<div></div>');
-  const leagues = [...new Set(D.players.map((p) => p.currentLeague))].sort((a, b) => leagueOf(a).level - leagueOf(b).level);
+  const leagues = HAS_LEAGUES
+    ? [...new Set(D.players.map((p) => p.currentLeague))].sort((a, b) => leagueOf(a).level - leagueOf(b).level)
+    : [];
 
   wrap.appendChild(el(`
     <div class="filters">
       <input type="search" id="q" placeholder="Hae pelaajaa..." value="${esc(state.q)}">
-      <select id="ageF">
+      ${HAS_AGES ? `<select id="ageF">
         <option value="">Kaikki ikäluokat</option>
         ${['12-14','15-16','17-18','19-20','21-22','23-26'].map((a) => `<option ${state.ageF === a ? 'selected' : ''}>${a}</option>`).join('')}
-      </select>
-      <select id="leagueF">
+      </select>` : ''}
+      ${HAS_LEAGUES ? `<select id="leagueF">
         <option value="">Kaikki sarjat</option>
         ${leagues.map((c) => `<option value="${c}" ${state.leagueF === c ? 'selected' : ''}>${c}</option>`).join('')}
-      </select>
+      </select>` : ''}
       <select id="statusF">
         <option value="">Kaikki tilanteet</option>
         <option value="injury" ${state.statusF === 'injury' ? 'selected' : ''}>Loukkaantumistausta</option>
@@ -228,12 +250,15 @@ function renderRoster() {
     </div>`));
   wrap.appendChild(el('<div class="psub" style="margin:-6px 0 12px">Klikkaa pelaajaa nähdäksesi kehityksen, vertailun ja tulostettavan analyysin.</div>'));
 
-  const m = metric('cmj');
-  let rows = D.players.map((p) => ({ p, imp: improvement(p, m), latestCmj: m.get(last(p)), inj: p.annotations.some((a) => a.type === 'injury') }));
+  /* Head-line metric: the first one the data actually has, so the column is
+     never empty when a battery does not include CMJ. */
+  const m = metricsPresent(D.players)[0] || metric('cmj');
+  const lastVal = (p) => { for (let i = p.sessions.length - 1; i >= 0; i--) { const v = m.get(p.sessions[i]); if (v != null) return v; } return null; };
+  let rows = D.players.map((p) => ({ p, imp: improvement(p, m), latest: lastVal(p), inj: p.annotations.some((a) => a.type === 'injury') }));
   rows = rows.filter(({ p, imp, inj }) => {
     if (state.q && !p.name.toLowerCase().includes(state.q.toLowerCase())) return false;
-    if (state.ageF && ageBucket(p.age) !== state.ageF) return false;
-    if (state.leagueF && p.currentLeague !== state.leagueF) return false;
+    if (HAS_AGES && state.ageF && ageBucket(p.age) !== state.ageF) return false;
+    if (HAS_LEAGUES && state.leagueF && p.currentLeague !== state.leagueF) return false;
     if (state.statusF === 'injury' && !inj) return false;
     if (state.statusF === 'rising' && !(imp > 1.5)) return false;
     if (state.statusF === 'falling' && !(imp < 1.5)) return false;
@@ -245,26 +270,30 @@ function renderRoster() {
     let va, vb;
     if (sk === 'age') { va = a.p.age; vb = b.p.age; }
     else if (sk === 'league') { va = leagueOf(a.p.currentLeague).level; vb = leagueOf(b.p.currentLeague).level; }
-    else if (sk === 'cmj') { va = a.latestCmj; vb = b.latestCmj; }
+    else if (sk === 'cmj') { va = a.latest; vb = b.latest; }
     else { va = a.imp ?? -999; vb = b.imp ?? -999; }
-    return (va - vb) * state.sortDir;
+    return ((va ?? -999) - (vb ?? -999)) * state.sortDir;
   });
 
   const th = (key, label, cls = '') => `<th class="${cls}" data-k="${key}">${label}${state.sortKey === key ? (state.sortDir > 0 ? ' ▲' : ' ▼') : ''}</th>`;
+  const hasPos = D.players.some((p) => p.position);
   const table = el(`
     <table class="roster">
       <thead><tr>
-        ${th('name', 'Pelaaja')}${th('age', 'Ikä', 'num')}${th('league', 'Sarjataso')}
-        <th>Pelipaikka</th>${th('cmj', 'CMJ nyt', 'num')}${th('imp', 'Kehitys', 'num')}<th>Tila</th>
+        ${th('name', 'Pelaaja')}
+        ${HAS_AGES ? th('age', 'Ikä', 'num') : ''}
+        ${HAS_LEAGUES ? th('league', 'Sarjataso') : ''}
+        ${hasPos ? '<th>Pelipaikka</th>' : ''}
+        ${th('cmj', esc(m.label) + ' nyt', 'num')}${th('imp', 'Kehitys', 'num')}<th>Tila</th>
       </tr></thead>
       <tbody>
-      ${rows.map(({ p, imp, latestCmj, inj }) => `
+      ${rows.map(({ p, imp, latest, inj }) => `
         <tr data-id="${p.id}">
           <td><div class="pname">${esc(p.name)}</div><div class="psub">${p.sessions.length} testiä · ${fmtD(first(p).date)} ... ${fmtD(last(p).date)}</div></td>
-          <td class="num">${p.age.toFixed(1)}</td>
-          <td>${leagueBadge(p.currentLeague)}</td>
-          <td>${esc(p.position)}</td>
-          <td class="num">${latestCmj.toFixed(1)} cm</td>
+          ${HAS_AGES ? `<td class="num">${p.age.toFixed(1)}</td>` : ''}
+          ${HAS_LEAGUES ? `<td>${leagueBadge(p.currentLeague)}</td>` : ''}
+          ${hasPos ? `<td>${esc(p.position || '-')}</td>` : ''}
+          <td class="num">${latest == null ? '<span class="psub">-</span>' : num(latest, m.unit) + ' ' + m.unit}</td>
           <td class="num">${trendHtml(imp)}</td>
           <td>${inj ? '<span class="flag">● vamma</span>' : '<span class="flag none">●</span>'}</td>
         </tr>`).join('')}
@@ -274,7 +303,7 @@ function renderRoster() {
   if (!rows.length) wrap.appendChild(el('<div class="empty">Ei osumia näillä suodattimilla.</div>'));
 
   wrap.querySelector('#q').oninput = (e) => { state.q = e.target.value; render(); setTimeout(() => { const q = $('#q'); if (q) { q.focus(); q.selectionStart = q.value.length; } }); };
-  ['ageF', 'leagueF', 'statusF'].forEach((id) => wrap.querySelector('#' + id).onchange = (e) => { state[id] = e.target.value; render(); });
+  ['ageF', 'leagueF', 'statusF'].forEach((id) => { const n = wrap.querySelector('#' + id); if (n) n.onchange = (e) => { state[id] = e.target.value; render(); }; });
   table.querySelectorAll('th[data-k]').forEach((h) => h.onclick = () => {
     const k = h.dataset.k;
     if (state.sortKey === k) state.sortDir *= -1; else { state.sortKey = k; state.sortDir = k === 'name' ? 1 : -1; }
@@ -313,18 +342,26 @@ function renderPlayer(id) {
   wrap.appendChild(bar);
 
   const L = last(p);
+  const stat = (k, v) => v == null ? '' : `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  const sub = [p.position, p.birthDate ? `syntynyt ${fmtDLong(p.birthDate)}` : null].filter(Boolean).join(' · ');
   wrap.appendChild(el(`
     <div class="card phead">
       <div style="flex:1 1 240px">
         <div class="big">${esc(p.name)}</div>
-        <div class="psub">${esc(p.position)} · syntynyt ${fmtDLong(p.birthDate)}</div>
+        ${sub ? `<div class="psub">${esc(sub)}</div>` : ''}
       </div>
-      <div class="stat"><span class="k">Ikä nyt</span><span class="v">${p.age.toFixed(1)} v</span></div>
-      <div class="stat"><span class="k">Sarjataso nyt</span><span class="v">${leagueBadge(p.currentLeague)}</span></div>
-      <div class="stat"><span class="k">Pituus nyt</span><span class="v">${L.heightCm} cm</span></div>
-      <div class="stat"><span class="k">Paino nyt</span><span class="v">${L.weightKg} kg</span></div>
-      <div class="stat"><span class="k">Testejä</span><span class="v">${p.sessions.length}</span></div>
+      ${stat('Ikä nyt', p.age == null ? null : p.age.toFixed(1) + ' v')}
+      ${stat('Sarjataso nyt', p.currentLeague == null ? null : leagueBadge(p.currentLeague))}
+      ${stat('Pituus nyt', L.heightCm == null ? null : L.heightCm + ' cm')}
+      ${stat('Paino nyt', (L.weightKg ?? p.weightKg) == null ? null : (L.weightKg ?? p.weightKg) + ' kg')}
+      ${stat('Testejä', p.sessions.length)}
+      ${stat('Jakso', `${fmtD(first(p).date)} ... ${fmtD(last(p).date)}`)}
     </div>`));
+
+  /* What the source does not contain is stated rather than filled in. */
+  if (p.notes && p.notes.length) {
+    wrap.appendChild(el(`<div class="callout"><b>Datan rajat.</b> ${p.notes.map(esc).join(' ')}</div>`));
+  }
 
   wrap.appendChild(renderTimeline(p));
 
@@ -332,10 +369,10 @@ function renderPlayer(id) {
 
   const two = el('<div class="grid two"></div>');
   two.appendChild(renderCurveCard(p));
-  two.appendChild(renderKeiserCard(p));
+  two.appendChild(renderBalanceCard(p));
   wrap.appendChild(two);
 
-  wrap.appendChild(renderLeagueContextCard(p));
+  if (HAS_PEERS) wrap.appendChild(renderLeagueContextCard(p));
 
   const two2 = el('<div class="grid two"></div>');
   two2.appendChild(renderSummaryCard(p));
@@ -349,35 +386,43 @@ function measRows(s) {
   const m = s.measurements, sk = s.skips || {};
   const item = (k, v) => `<div class="meas"><span class="mk">${k}</span><span class="mv">${v}</span></div>`;
   const skipTxt = (code) => `<span class="meas-skip">ei testattu (${esc(sk[code])})</span>`;
-  const line = (code, k, v) => item(k, sk[code] ? skipTxt(code) : v);
-  return `
-    ${line('cmj', 'CMJ (kahdella / O / V)', `${m.cmj.both} cm (${m.cmj.right} / ${m.cmj.left})`)}
-    ${line('sj', 'Squat Jump (kahdella / O / V)', `${m.sj.both} cm (${m.sj.right} / ${m.sj.left})`)}
-    ${line('sprint30', '30 m juoksu', `${m.sprint30} s`)}
-    ${line('sprint10', '10 m kiihdytys', `${m.sprint10} s`)}
-    ${line('agility505', '505-ketteryys (O / V)', `${m.agility505.right} / ${m.agility505.left} s`)}
-    ${line('ybalance', 'Y-tasapaino', `${m.ybalance} %`)}
-    ${line('ankle', 'Nilkan liikkuvuus (O / V)', `${m.ankle.right} / ${m.ankle.left} cm`)}
-    ${line('keiser', 'Keiser teho', `${m.keiser[0].loadKg} kg: ${m.keiser[0].watts} W · ${m.keiser[1].loadKg} kg: ${m.keiser[1].watts} W`)}`;
+  /* A test simply absent from a session is left out entirely; only an explicit
+     skip is spelled out. Rows of "-" would suggest a failed test. */
+  const line = (code, k, v, has) => sk[code] ? item(k, skipTxt(code)) : (has ? item(k, v) : '');
+  const sides = (o, unit) => o.right == null || o.left == null ? '' : ` (O ${num(o.right, unit)} / V ${num(o.left, unit)})`;
+  return [
+    line('cmj', 'CMJ (kahdella)', `${num(m.cmj.both, 'cm')} cm${sides(m.cmj, 'cm')}`, m.cmj.both != null),
+    line('cmj1', 'CMJ (yhdellä)', `O ${num(m.cmj.right, 'cm')} / V ${num(m.cmj.left, 'cm')} cm`, m.cmj.both == null && m.cmj.right != null),
+    line('sj', 'Squat Jump (kahdella)', `${num(m.sj.both, 'cm')} cm${sides(m.sj, 'cm')}`, m.sj.both != null),
+    line('sj1', 'Squat Jump (yhdellä)', `O ${num(m.sj.right, 'cm')} / V ${num(m.sj.left, 'cm')} cm`, m.sj.both == null && m.sj.right != null),
+    line('snap', 'Snap Drive, tehohuippu', `O ${num(m.snap.right, 'W')} / V ${num(m.snap.left, 'W')} W`, m.snap.right != null),
+    line('snapFixed', `Snap Drive, vakiokuorma${m.snapFixed.loadKg ? ' ' + m.snapFixed.loadKg + ' kg' : ''}`,
+         `O ${num(m.snapFixed.right, 'W')} / V ${num(m.snapFixed.left, 'W')} W`, m.snapFixed.right != null),
+    line('keiser', 'Keiser-jalkaprässi (2 jalkaa)',
+         `${num(m.keiser.watts, 'W')} W${m.keiser.wattsPerKg == null ? '' : ` · ${num(m.keiser.wattsPerKg, 'W/kg')} W/kg`}`, m.keiser.watts != null),
+    line('legPress', 'Leg press (indeksi)', `${num(m.legPress, 'idx')}`, m.legPress != null),
+  ].filter(Boolean).join('') || '<div class="psub">Ei kirjattuja tuloksia tälle testikerralle.</div>';
 }
 function renderSessionsCard(p) {
-  const card = el('<div class="card"><h3>Testikerrat päivämäärittäin <span class="sub">(klikkaa rivi auki: tulokset, pituus, paino ja sarjataso kyseisen testin aikaan)</span></h3></div>');
+  const card = el('<div class="card"><h3>Testikerrat päivämäärittäin <span class="sub">(klikkaa rivi auki nähdäksesi kaikki kyseisen kerran tulokset)</span></h3></div>');
   const sess = [...p.sessions].reverse(); // newest first
+  const anyHeight = p.sessions.some((s) => s.heightCm != null);
+  const cols = 4 + (HAS_AGES ? 1 : 0) + (HAS_LEAGUES ? 1 : 0) + (anyHeight ? 1 : 0);
   const table = el(`
     <table class="sessions">
-      <thead><tr><th>Päivämäärä</th><th class="num">Ikä</th><th>Sarjataso</th><th class="num">Pituus</th><th class="num">Paino</th><th class="num">CMJ</th><th></th></tr></thead>
+      <thead><tr><th>Päivämäärä</th>${HAS_AGES ? '<th class="num">Ikä</th>' : ''}${HAS_LEAGUES ? '<th>Sarjataso</th>' : ''}${anyHeight ? '<th class="num">Pituus</th>' : ''}<th class="num">Paino</th><th class="num">Mitattu</th><th></th></tr></thead>
       <tbody>
       ${sess.map((s) => `
         <tr class="srow" data-sid="${s.id}">
           <td><b>${fmtDLong(s.date)}</b>${s.userAdded ? ' <span class="tag-added">lisätty</span>' : ''}</td>
-          <td class="num">${s.ageYears} v</td>
-          <td>${leagueBadge(s.league)}</td>
-          <td class="num">${s.heightCm} cm</td>
-          <td class="num">${s.weightKg} kg</td>
-          <td class="num">${s.measurements.cmj.both == null ? '<span class="psub">ei test.</span>' : s.measurements.cmj.both + ' cm'} ${s.flagged ? '<span class="flag" title="vamma-ajanjakso">●</span>' : ''}</td>
+          ${HAS_AGES ? `<td class="num">${s.ageYears == null ? '-' : s.ageYears + ' v'}</td>` : ''}
+          ${HAS_LEAGUES ? `<td>${s.league == null ? '-' : leagueBadge(s.league)}</td>` : ''}
+          ${anyHeight ? `<td class="num">${s.heightCm == null ? '-' : s.heightCm + ' cm'}</td>` : ''}
+          <td class="num">${s.weightKg == null ? '<span class="psub">-</span>' : s.weightKg + ' kg'}</td>
+          <td class="num">${countMeasured(s)} testiä ${s.flagged ? '<span class="flag" title="vamma-ajanjakso">●</span>' : ''}</td>
           <td class="num act">${state.role !== 'player' ? '<span class="row-act edit" data-sid="' + s.id + '">Muokkaa</span> · ' : ''}<span class="row-act rep-link" data-sid="${s.id}">Raportti</span> · <span class="expand">avaa</span></td>
         </tr>
-        <tr class="sdetail" data-for="${s.id}" hidden><td colspan="7"><div class="meas-grid">${measRows(s)}</div></td></tr>`).join('')}
+        <tr class="sdetail" data-for="${s.id}" hidden><td colspan="${cols}"><div class="meas-grid">${measRows(s)}</div></td></tr>`).join('')}
       </tbody>
     </table>`);
   card.appendChild(table);
@@ -391,6 +436,9 @@ function renderSessionsCard(p) {
   });
   return card;
 }
+
+/* How many of the battery's tests this session actually carries. */
+const countMeasured = (s) => METRICS.filter((m) => m.get(s) != null).length;
 
 const ANNO_COLORS = { injury: 'var(--red)', illness: 'var(--orange)', growth: 'var(--purple)', position: 'var(--blue)', training: 'var(--green)', rest: 'var(--muted)', other: 'var(--teal)' };
 function renderTimeline(p) {
@@ -432,31 +480,105 @@ function renderTimeline(p) {
 
 function renderCurveCard(p) {
   const card = el('<div class="card"></div>');
+  const present = metricsPresent([p]);
+  if (present.length && !present.some((x) => x.code === state.metric)) state.metric = present[0].code;
   const m = metric(state.metric);
   card.appendChild(el(`<h3>Kehityskaari <span class="sub">(oma lähtötaso yli ajan) · ${esc(m.label)} ${m.unit}</span></h3>`));
   const chips = el('<div class="mchips"></div>');
-  for (const mm of METRICS) {
+  for (const mm of present) {
     const b = el(`<button class="${mm.code === state.metric ? 'active' : ''}">${esc(mm.label)}</button>`);
     b.onclick = () => { state.metric = mm.code; render(); };
     chips.appendChild(b);
   }
   card.appendChild(chips);
-  const refBtn = el(`<div class="mchips"><button class="${state.leagueRef ? 'active' : ''}">${state.leagueRef ? '✓ ' : ''}Oman sarjan taso</button></div>`);
-  refBtn.querySelector('button').onclick = () => { state.leagueRef = !state.leagueRef; render(); };
-  card.appendChild(refBtn);
+
+  /* Reference line. With a peer population it is the player's own league level;
+     otherwise the player's own previous-season baseline, where the source has one. */
+  const baseKey = m.code === 'cmj' ? 'cmj' : m.code === 'sj' ? 'sj' : null;
+  const ownBase = baseKey && p.baseline2025 ? p.baseline2025[baseKey] : null;
+  const canRef = HAS_PEERS || ownBase != null;
+  if (canRef) {
+    const label = HAS_PEERS ? 'Oman sarjan taso' : 'Kauden 2025 taso';
+    const refBtn = el(`<div class="mchips"><button class="${state.leagueRef ? 'active' : ''}">${state.leagueRef ? '✓ ' : ''}${label}</button></div>`);
+    refBtn.querySelector('button').onclick = () => { state.leagueRef = !state.leagueRef; render(); };
+    card.appendChild(refBtn);
+  }
 
   const pts = p.sessions.map((s) => ({ t: parseD(s.date).getTime(), y: m.get(s), s })).filter((pt) => pt.y != null);
   const injurySpans = p.annotations.filter((a) => a.type === 'injury' && a.endDate).map((a) => ({ start: parseD(a.startDate).getTime(), end: parseD(a.endDate).getTime() }));
-  const refPoints = state.leagueRef ? pts.map(({ s }) => {
-    const vals = matchedValuesAtAgeLeague(s.ageYears, s.league, m, p.id);
-    return { t: parseD(s.date).getTime(), y: vals.length ? Math.round((vals.reduce((a, c) => a + c, 0) / vals.length) * 10) / 10 : null, label: s.league };
-  }) : [];
-  if (pts.length) card.appendChild(lineChart(pts, { unit: m.unit, hb: m.hb, injurySpans, color: 'var(--teal)', refPoints }));
+  let refPoints = [];
+  if (state.leagueRef && canRef) {
+    refPoints = HAS_PEERS
+      ? pts.map(({ s }) => {
+          const vals = matchedValuesAtAgeLeague(s.ageYears, s.league, m, p.id);
+          return { t: parseD(s.date).getTime(), y: vals.length ? Math.round((vals.reduce((a, c) => a + c, 0) / vals.length) * 10) / 10 : null, label: s.league };
+        })
+      : pts.map(({ s }) => ({ t: parseD(s.date).getTime(), y: ownBase, label: '' }));
+  }
+  if (pts.length) card.appendChild(lineChart(pts, { unit: m.unit, hb: m.hb, injurySpans, color: 'var(--teal)', refPoints, refLabel: HAS_PEERS ? 'Oman sarjan taso' : 'Kauden 2025 taso' }));
   else card.appendChild(el('<div class="empty">Ei mitattuja arvoja tälle testille.</div>'));
 
-  const present = [...new Set(p.sessions.map((s) => s.league))].sort((a, b) => leagueOf(a).level - leagueOf(b).level);
-  card.appendChild(el(`<div class="lg-legend"><span class="lg-item"><span class="lg-line" style="background:var(--teal)"></span>oma tulos</span>${state.leagueRef ? '<span class="lg-item"><span class="lg-line dashed"></span>oman sarjan taso</span>' : ''}${present.map((c) => `<span class="lg-item">${leagueSwatch(c)}${c}</span>`).join('')}</div>`));
-  card.appendChild(el(`<div class="psub" style="margin-top:6px">Pisteen väri on sarjataso kyseisen testin aikaan.${!m.hb ? ' Pienempi arvo on parempi (aika).' : ''} Katkoviiva on sen sarjan keskitaso, jossa pelaaja kulloinkin pelasi.</div>`));
+  const leaguesHere = HAS_LEAGUES ? [...new Set(p.sessions.map((s) => s.league).filter(Boolean))].sort((a, b) => leagueOf(a).level - leagueOf(b).level) : [];
+  card.appendChild(el(`<div class="lg-legend"><span class="lg-item"><span class="lg-line" style="background:var(--teal)"></span>oma tulos</span>${state.leagueRef && canRef ? `<span class="lg-item"><span class="lg-line dashed"></span>${HAS_PEERS ? 'oman sarjan taso' : 'kauden 2025 taso'}</span>` : ''}${leaguesHere.map((c) => `<span class="lg-item">${leagueSwatch(c)}${c}</span>`).join('')}</div>`));
+  const notes = [];
+  if (HAS_LEAGUES) notes.push('Pisteen väri on sarjataso kyseisen testin aikaan.');
+  if (!m.hb) notes.push('Pienempi arvo on parempi (aika).');
+  if (state.leagueRef && canRef) notes.push(HAS_PEERS ? 'Katkoviiva on sen sarjan keskitaso, jossa pelaaja kulloinkin pelasi.' : 'Katkoviiva on pelaajan oma kauden 2025 vertailutaso.');
+  if (notes.length) card.appendChild(el(`<div class="psub" style="margin-top:6px">${notes.join(' ')}</div>`));
+  return card;
+}
+
+/* --- left/right balance over time; the method's own claim is symmetry --- */
+function renderBalanceCard(p) {
+  const card = el('<div class="card"><h3>Puolierot <span class="sub">(oikea vs. vasen yli ajan)</span></h3></div>');
+  const SIDED = [
+    { code: 'cmj', label: 'CMJ', unit: 'cm', get: (s) => s.measurements.cmj },
+    { code: 'sj', label: 'Squat Jump', unit: 'cm', get: (s) => s.measurements.sj },
+    { code: 'snap', label: 'Snap Drive', unit: 'W', get: (s) => s.measurements.snap },
+  ].filter((x) => p.sessions.some((s) => { const o = x.get(s); return o && o.right != null && o.left != null; }));
+
+  if (!SIDED.length) { card.appendChild(el('<div class="empty">Ei puolikohtaisia mittauksia.</div>')); return card; }
+
+  const rows = [];
+  for (const x of SIDED) {
+    for (let i = p.sessions.length - 1; i >= 0; i--) {
+      const o = x.get(p.sessions[i]);
+      if (o && o.right != null && o.left != null) {
+        const asym = Math.abs(o.right - o.left) / ((o.right + o.left) / 2) * 100;
+        rows.push({ x, s: p.sessions[i], o, asym });
+        break;
+      }
+    }
+  }
+  card.appendChild(el(`
+    <table class="sum">
+      <thead><tr><th>Testi</th><th class="num">Oikea</th><th class="num">Vasen</th><th class="num">Ero</th></tr></thead>
+      <tbody>${rows.map((r) => `
+        <tr>
+          <td>${esc(r.x.label)}<div class="psub">uusin: ${fmtD(r.s.date)}</div></td>
+          <td class="num">${num(r.o.right, r.x.unit)} ${r.x.unit}</td>
+          <td class="num">${num(r.o.left, r.x.unit)} ${r.x.unit}</td>
+          <td class="num"><span class="${r.asym < 5 ? 'good' : r.asym < 10 ? 'warn' : 'bad'}">${r.asym.toFixed(1)} %</span></td>
+        </tr>`).join('')}</tbody>
+    </table>`));
+
+  /* Asymmetry trend: one line per sided test, so a widening gap is visible. */
+  const series = SIDED.map((x, i) => ({
+    name: x.label,
+    color: ['var(--teal)', 'var(--blue)', 'var(--yellow)'][i % 3],
+    points: p.sessions.map((s) => {
+      const o = x.get(s);
+      if (!o || o.right == null || o.left == null) return null;
+      return { x: parseD(s.date).getTime(), y: Math.round(Math.abs(o.right - o.left) / ((o.right + o.left) / 2) * 1000) / 10, s };
+    }).filter(Boolean),
+    showDots: true,
+  })).filter((sr) => sr.points.length >= 2);
+  if (series.length) {
+    card.appendChild(el('<div class="psub" style="margin:12px 0 4px">Puolieron kehitys, % (pienempi on parempi)</div>'));
+    card.appendChild(multiLineChart(series, { unit: '%', hb: false, xMode: 'date', zeroFloor: true }));
+    card.appendChild(el(`<div class="lg-legend">${series.map((sr) => `<span class="lg-item"><span class="lg-line" style="background:${sr.color}"></span>${esc(sr.name)}</span>`).join('')}</div>`));
+  }
+  card.appendChild(el('<div class="callout">Alle 5 % puoliero on tavoitetaso. Yli 10 % on syytä kohdentaa harjoittelussa.</div>'));
   return card;
 }
 
@@ -489,67 +611,67 @@ function renderLeagueContextCard(p) {
   return card;
 }
 
-function renderKeiserCard(p) {
-  const card = el('<div class="card"><h3>Keiser FVP-profiili <span class="sub">(teho suhteessa kuormaan, uusin testi)</span></h3></div>');
-  const k = last(p).measurements.keiser, w = last(p).weightKg;
-  if (k[0].watts == null || k[1].watts == null) { card.appendChild(el('<div class="empty">Keiser-testiä ei tehty tässä testissä.</div>')); return card; }
-  const ratio = k[0].watts / k[1].watts, wpk = k[0].watts / w;
-  card.appendChild(fvpChart(k));
-  card.appendChild(el(`
-    <div style="margin-top:10px">
-      <div class="kv-row"><span class="k">Teho kevyellä kuormalla (${k[0].loadKg} kg)</span><span class="v">${k[0].watts} W</span></div>
-      <div class="kv-row"><span class="k">Teho raskaalla kuormalla (${k[1].loadKg} kg)</span><span class="v">${k[1].watts} W</span></div>
-      <div class="kv-row"><span class="k">FVP-suhde</span><span class="v ${ratio >= 1.15 && ratio <= 1.4 ? 'good' : 'warn'}">${ratio.toFixed(2)}</span></div>
-      <div class="kv-row"><span class="k">Suhteellinen teho</span><span class="v">${wpk.toFixed(1)} W/kg</span></div>
-    </div>`));
-  return card;
-}
-
 function renderSummaryCard(p) {
   const lg = last(p).league;
-  const card = el(`<div class="card"><h3>Kokoava taulukko <span class="sub">(lähtö, nyt, ja vertailu sarjassa ${esc(lg)})</span></h3></div>`);
-  const rows = METRICS.map((m) => {
-    const b = m.get(first(p)), l = m.get(last(p)), imp = improvement(p, m);
+  const card = el(`<div class="card"><h3>Kokoava taulukko <span class="sub">${HAS_PEERS ? `(lähtö, nyt, ja vertailu sarjassa ${esc(lg)})` : '(lähtö, nyt ja kehitys jaksolla)'}</span></h3></div>`);
+  /* First and last MEASURED value per test, not first and last session: the
+     battery is not run in full every time, so session order is not enough. */
+  const edge = (m, dir) => {
+    const idx = dir > 0 ? [...p.sessions.keys()] : [...p.sessions.keys()].reverse();
+    for (const i of idx) { const v = m.get(p.sessions[i]); if (v != null) return { v, s: p.sessions[i] }; }
+    return null;
+  };
+  const rows = metricsPresent([p]).map((m) => {
+    const b = edge(m, 1), l = edge(m, -1);
+    const imp = b && l && b.s !== l.s && b.v !== 0 ? (m.hb ? (l.v - b.v) / b.v : (b.v - l.v) / b.v) * 100 : null;
+    const base = p.baseline2025 ? p.baseline2025[m.code] : null;
     const { values } = leaguePeerValues(p, m);
     const peerAvg = values.length ? values.reduce((a, c) => a + c, 0) / values.length : null;
-    const pctl = percentileRank(l, values, m.hb);
-    return { m, b, l, imp, peerAvg, pctl };
+    const pctl = percentileRank(l ? l.v : null, values, m.hb);
+    return { m, b, l, imp, base, peerAvg, pctl };
   });
+  const anyBase = rows.some((r) => r.base != null);
   const t = el(`
     <table class="sum">
-      <thead><tr><th>Testi</th><th>Lähtö</th><th>Nyt</th><th>Kehitys</th><th>Sarjan ka</th><th>Percentiili</th></tr></thead>
+      <thead><tr><th>Testi</th><th>Lähtö</th><th>Nyt</th><th>Kehitys</th>${anyBase ? '<th>2025-taso</th>' : ''}${HAS_PEERS ? '<th>Sarjan ka</th><th>Percentiili</th>' : ''}</tr></thead>
       <tbody>
-      ${rows.map(({ m, b, l, imp, peerAvg, pctl }) => `
+      ${rows.map(({ m, b, l, imp, base, peerAvg, pctl }) => `
         <tr>
           <td>${esc(m.label)}<div class="psub">${m.unit}</div></td>
-          <td>${num(b, m.unit)}</td><td><b>${num(l, m.unit)}</b></td><td>${trendHtml(imp)}</td>
-          <td>${peerAvg == null ? '-' : num(peerAvg, m.unit)}</td>
+          <td>${b == null ? '-' : num(b.v, m.unit)}<div class="psub">${b == null ? '' : fmtD(b.s.date)}</div></td>
+          <td><b>${l == null ? '-' : num(l.v, m.unit)}</b><div class="psub">${l == null ? '' : fmtD(l.s.date)}</div></td>
+          <td>${trendHtml(imp)}</td>
+          ${anyBase ? `<td>${base == null ? '-' : num(base, m.unit) + (l == null ? '' : ' <span class="' + ((m.hb ? l.v >= base : l.v <= base) ? 'good' : 'bad') + '">' + ((m.hb ? l.v >= base : l.v <= base) ? '▲' : '▼') + '</span>')}</td>` : ''}
+          ${HAS_PEERS ? `<td>${peerAvg == null ? '-' : num(peerAvg, m.unit)}</td>
           <td class="pct-cell ${pctClass(pctl)}">${pctl == null ? '-' : pctl + '.'}
             <div class="mini-bar"><span style="width:${pctl || 0}%;background:var(--${pctl >= 66 ? 'green' : pctl >= 33 ? 'orange' : 'red'})"></span></div>
-          </td>
+          </td>` : ''}
         </tr>`).join('')}
       </tbody>
     </table>`);
   card.appendChild(t);
-  card.appendChild(el(`<div class="callout">Vertailu käyttää vain testejä, jotka on tehty sarjassa <b>${esc(lg)}</b> samanikäisillä pelaajilla. Percentiili on osuus näistä, jotka pelaaja ylittää. <b>Oma kehitys yli ajan on ensisijainen, vertailu on konteksti.</b></div>`));
+  card.appendChild(el(HAS_PEERS
+    ? `<div class="callout">Vertailu käyttää vain testejä, jotka on tehty sarjassa <b>${esc(lg)}</b> samanikäisillä pelaajilla. Percentiili on osuus näistä, jotka pelaaja ylittää. <b>Oma kehitys yli ajan on ensisijainen, vertailu on konteksti.</b></div>`
+    : `<div class="callout">Aineistossa ei ole ikä- eikä sarjatietoa, joten vertailuryhmää muihin pelaajiin ei muodosteta. <b>Kehitys mitataan pelaajan omaa lähtötasoa vasten.</b>${anyBase ? ' 2025-taso on edellisen kauden vertailuarvo.' : ''}</div>`));
   return card;
 }
 
 function renderRatiosCard(p) {
-  const s = last(p).measurements;
-  const hasCmj = s.cmj.both != null && s.cmj.right != null && s.cmj.left != null;
-  const ssc = hasCmj && s.sj.both != null ? ((s.cmj.both - s.sj.both) / s.sj.both) * 100 : null;
-  const bilat = hasCmj ? s.cmj.both / (s.cmj.right + s.cmj.left) : null;
-  const asym = hasCmj ? Math.abs(s.cmj.right - s.cmj.left) / ((s.cmj.right + s.cmj.left) / 2) * 100 : null;
-  const ankleAsym = s.ankle.right != null && s.ankle.left != null ? Math.abs(s.ankle.right - s.ankle.left) : null;
-  const card = el('<div class="card"><h3>Suhdeluvut <span class="sub">(SBAQ-profiilin laatu, uusin testi)</span></h3></div>');
-  const row = (k, v, cls, note) => `<div class="kv-row"><span class="k">${k}<div class="psub">${note}</div></span><span class="v ${cls}">${v}</span></div>`;
+  /* Take each ratio from the newest session that actually has its inputs. */
+  const newestWith = (fn) => { for (let i = p.sessions.length - 1; i >= 0; i--) { const v = fn(p.sessions[i]); if (v != null) return { v, s: p.sessions[i] }; } return null; };
+  const ssc = newestWith((s) => { const m = s.measurements; return m.cmj.both != null && m.sj.both != null && m.sj.both !== 0 ? ((m.cmj.both - m.sj.both) / m.sj.both) * 100 : null; });
+  const bilat = newestWith((s) => { const c = s.measurements.cmj; return c.both != null && c.right != null && c.left != null && (c.right + c.left) !== 0 ? c.both / (c.right + c.left) : null; });
+  const asym = newestWith((s) => { const c = s.measurements.cmj; return c.right != null && c.left != null ? Math.abs(c.right - c.left) / ((c.right + c.left) / 2) * 100 : null; });
+  const snapAsym = newestWith((s) => { const c = s.measurements.snap; return c.right != null && c.left != null ? Math.abs(c.right - c.left) / ((c.right + c.left) / 2) * 100 : null; });
+
+  const card = el('<div class="card"><h3>Suhdeluvut <span class="sub">(SBAQ-profiilin laatu, uusin mittaus per suhdeluku)</span></h3></div>');
   const na = '<span class="psub">ei mitattu</span>';
+  const row = (k, r, fmt, cls, note) => `<div class="kv-row"><span class="k">${k}<div class="psub">${note}${r ? ' · ' + fmtD(r.s.date) : ''}</div></span><span class="v ${r ? cls(r.v) : ''}">${r ? fmt(r.v) : na}</span></div>`;
   card.appendChild(el(`<div>
-    ${row('SSC eli elastisuus (CMJ vs SJ)', ssc == null ? na : ssc.toFixed(1) + ' %', ssc == null ? '' : ssc >= 5 ? 'good' : ssc >= 2 ? 'warn' : 'bad', 'Optimi +10...15 %')}
-    ${row('Bilateraalinen suhde', bilat == null ? na : bilat.toFixed(2), bilat == null ? '' : bilat >= 0.9 && bilat <= 1.1 ? 'good' : 'warn', 'Normaali 0,90...1,10')}
-    ${row('Sivuasymmetria (CMJ)', asym == null ? na : asym.toFixed(1) + ' %', asym == null ? '' : asym < 5 ? 'good' : asym < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
-    ${row('Nilkan sivuero', ankleAsym == null ? na : ankleAsym.toFixed(1) + ' cm', ankleAsym == null ? '' : ankleAsym < 1.5 ? 'good' : 'warn', 'Tavoite alle 1,5 cm')}
+    ${row('SSC eli elastisuus (CMJ vs SJ)', ssc, (v) => v.toFixed(1) + ' %', (v) => v >= 5 ? 'good' : v >= 2 ? 'warn' : 'bad', 'Optimi +10...15 %')}
+    ${row('Bilateraalinen suhde', bilat, (v) => v.toFixed(2), (v) => v >= 0.9 && v <= 1.1 ? 'good' : 'warn', 'Normaali 0,90...1,10')}
+    ${row('Sivuasymmetria (CMJ)', asym, (v) => v.toFixed(1) + ' %', (v) => v < 5 ? 'good' : v < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
+    ${row('Sivuasymmetria (Snap Drive)', snapAsym, (v) => v.toFixed(1) + ' %', (v) => v < 5 ? 'good' : v < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
   </div>`));
   return card;
 }
@@ -565,38 +687,47 @@ function renderCompare() {
   if (!state.focusId || !D.players.some((p) => p.id === state.focusId)) state.focusId = state.playerId || D.players[0].id;
   const focus = D.players.find((p) => p.id === state.focusId);
   if (state.compareAge == null) state.compareAge = focus.age;
+  const presentM = metricsPresent(D.players);
+  if (presentM.length && !presentM.some((x) => x.code === state.compareMetric)) state.compareMetric = presentM[0].code;
   const m = metric(state.compareMetric);
 
-  const posF = state.comparePosition;
+  const hasPos = D.players.some((q) => q.position);
+  const posF = hasPos ? state.comparePosition : '';
+  /* Age-matched scatter needs ages. Without them only the time trend is honest. */
+  const canScatter = HAS_AGES;
+  if (!canScatter) state.compareMode = 'trend';
   const scatterMode = state.compareMode === 'scatter';
 
   /* ---- controls ---- */
   const ctl = el('<div class="card"></div>');
   ctl.appendChild(el(`<h3>Vertaa pelaajaa <span class="sub">ikä-täsmätty hajonta tai kehityskaari yli ajan</span></h3>`));
-  const playerOpts = D.players.map((p) => `<option value="${p.id}" ${p.id === focus.id ? 'selected' : ''}>${esc(p.name)} (${p.age.toFixed(1)} v, ${p.currentLeague})</option>`).join('');
-  const leagueOpts = D.leagues.filter((l) => D.players.some((p) => p.sessions.some((s) => s.league === l.code)))
+  const playerOpts = D.players.map((p) => {
+    const meta = [p.age == null ? null : p.age.toFixed(1) + ' v', p.currentLeague].filter(Boolean).join(', ');
+    return `<option value="${p.id}" ${p.id === focus.id ? 'selected' : ''}>${esc(p.name)}${meta ? ` (${meta})` : ''}</option>`;
+  }).join('');
+  const leagueOpts = (D.leagues || []).filter((l) => D.players.some((p) => p.sessions.some((s) => s.league === l.code)))
     .map((l) => `<option value="${l.code}" ${state.compareLeague === l.code ? 'selected' : ''}>Vain ${l.code}</option>`).join('');
   ctl.appendChild(el(`<div class="cmp-controls">
     <label class="fld"><span>Fokuspelaaja</span><select id="cf" ${state.role === 'player' ? 'disabled' : ''}>${playerOpts}</select></label>
-    <label class="fld"><span>Pelipaikka</span><select id="cp">
+    ${hasPos ? `<label class="fld"><span>Pelipaikka</span><select id="cp">
       <option value="">Kaikki pelipaikat</option>
       ${['Hyökkääjä', 'Puolustaja', 'Maalivahti'].map((x) => `<option ${posF === x ? 'selected' : ''}>${x}</option>`).join('')}
-    </select></label>
-    <label class="fld"><span>Sarjat</span><select id="cl">
+    </select></label>` : ''}
+    ${HAS_LEAGUES ? `<label class="fld"><span>Sarjat</span><select id="cl">
       <option value="">Kaikki sarjat</option>
       <option value="same" ${state.compareLeague === 'same' ? 'selected' : ''}>Sama kuin fokus</option>
       ${leagueOpts}
-    </select></label>
+    </select></label>` : ''}
     ${scatterMode ? `<label class="fld"><span>Vertailuikä: <b id="caLbl">${state.compareAge.toFixed(1)} v</b></span>
       <input id="ca" type="range" min="12" max="26" step="0.5" value="${state.compareAge}"></label>` : ''}
   </div>`));
   const modeRow = el(`<div class="mchips" style="margin-bottom:10px">
-    <button id="mScatter" class="${scatterMode ? 'active' : ''}">Hajonta vertailuikänä</button>
+    ${canScatter ? `<button id="mScatter" class="${scatterMode ? 'active' : ''}">Hajonta vertailuikänä</button>` : ''}
     <button id="mTrend" class="${!scatterMode ? 'active' : ''}">Kehityskaari yli ajan</button>
   </div>`);
-  ctl.appendChild(modeRow);
+  if (canScatter) ctl.appendChild(modeRow);
   const chips = el('<div class="mchips"></div>');
-  for (const mm of METRICS) {
+  for (const mm of presentM) {
     const b = el(`<button class="${mm.code === state.compareMetric ? 'active' : ''}">${esc(mm.label)}</button>`);
     b.onclick = () => { state.compareMetric = mm.code; render(); };
     chips.appendChild(b);
@@ -609,10 +740,10 @@ function renderCompare() {
 
   /* ---- events ---- */
   ctl.querySelector('#cf').onchange = (e) => { state.focusId = e.target.value; state.compareAge = D.players.find((p) => p.id === e.target.value).age; render(); };
-  ctl.querySelector('#cp').onchange = (e) => { state.comparePosition = e.target.value; render(); };
-  ctl.querySelector('#cl').onchange = (e) => { state.compareLeague = e.target.value; render(); };
-  modeRow.querySelector('#mScatter').onclick = () => { state.compareMode = 'scatter'; render(); };
-  modeRow.querySelector('#mTrend').onclick = () => { state.compareMode = 'trend'; render(); };
+  const cp = ctl.querySelector('#cp'); if (cp) cp.onchange = (e) => { state.comparePosition = e.target.value; render(); };
+  const cl = ctl.querySelector('#cl'); if (cl) cl.onchange = (e) => { state.compareLeague = e.target.value; render(); };
+  const ms = modeRow.querySelector('#mScatter'); if (ms) ms.onclick = () => { state.compareMode = 'scatter'; render(); };
+  const mt = modeRow.querySelector('#mTrend'); if (mt) mt.onclick = () => { state.compareMode = 'trend'; render(); };
   const ca = ctl.querySelector('#ca');
   if (ca) {
     ca.oninput = (e) => { ctl.querySelector('#caLbl').textContent = Number(e.target.value).toFixed(1) + ' v'; };
@@ -660,7 +791,7 @@ function renderCompareScatter(wrap, focus, m, posF) {
 
 function renderCompareTrend(wrap, focus, m, posF) {
   let list = D.players.filter((q) => !posF || q.position === posF);
-  const lf = state.compareLeague;
+  const lf = HAS_LEAGUES ? state.compareLeague : '';
   if (lf === 'same') list = list.filter((q) => q.id === focus.id || q.sessions.some((s) => s.league === focus.currentLeague));
   else if (lf) list = list.filter((q) => q.id === focus.id || q.sessions.some((s) => s.league === lf));
   const others = list.filter((q) => q.id !== focus.id);
@@ -668,19 +799,33 @@ function renderCompareTrend(wrap, focus, m, posF) {
   const shown = [focus, ...others.slice(0, CAP)].filter((q, i, a) => a.indexOf(q) === i);
   const truncated = others.length > CAP;
 
+  /* Age on the x-axis lines players up by development stage; without ages the
+     only meaningful axis is the calendar. */
+  const byDate = !HAS_AGES;
   const chart = el('<div class="card"></div>');
-  chart.appendChild(el(`<h3>Kehityskaari yli ajan <span class="sub">${esc(m.label)} ${m.unit} · ikä x-akselilla${posF ? ' · ' + esc(posF) : ''}</span></h3>`));
+  chart.appendChild(el(`<h3>Kehityskaari yli ajan <span class="sub">${esc(m.label)} ${m.unit} · ${byDate ? 'päivämäärä' : 'ikä'} x-akselilla${posF ? ' · ' + esc(posF) : ''}</span></h3>`));
+  const PALETTE = ['#8098c0', '#d29a6a', '#a99bc7', '#86b892', '#cbb06a', '#cd8a7d'];
+  let ci = 0;
   const series = shown.map((q) => ({
     pid: q.id, name: q.name, focus: q.id === focus.id, league: q.currentLeague,
-    points: q.sessions.map((s) => ({ age: s.ageYears, y: m.get(s) })).filter((pt) => pt.y != null),
+    color: q.id === focus.id ? 'var(--teal)' : (HAS_LEAGUES ? null : PALETTE[ci++ % PALETTE.length]),
+    showDots: !HAS_LEAGUES,
+    points: q.sessions.map((s) => ({ x: byDate ? parseD(s.date).getTime() : s.ageYears, y: m.get(s), s }))
+      .filter((pt) => pt.y != null && pt.x != null),
   })).filter((s) => s.points.length);
+
   if (series.length) {
-    const svg = multiLineChart(series, { unit: m.unit, hb: m.hb });
+    const svg = multiLineChart(series, { unit: m.unit, hb: m.hb, xMode: byDate ? 'date' : 'age' });
     attachPointClicks(svg);
     chart.appendChild(svg);
-    const present = [...new Set(series.filter((s) => !s.focus).map((s) => s.league))].sort((a, b) => leagueOf(a).level - leagueOf(b).level);
-    chart.appendChild(el(`<div class="lg-legend"><span class="lg-item"><span class="lg-line" style="background:var(--teal)"></span>${esc(focus.name)} (fokus)</span>${present.map((c) => `<span class="lg-item">${leagueSwatch(c)}${c}</span>`).join('')}</div>`));
-    chart.appendChild(el(`<div class="callout">Jokainen viiva on yhden pelaajan kehitys yli ajan, väri on nykyinen sarjataso. <b>${esc(focus.name)}</b> on korostettu (paksu). Klikkaa viivaa avataksesi pelaajan.${truncated ? ` Näytetään ${shown.length} pelaajaa (rajauksessa ${others.length + 1}).` : ''}</div>`));
+    const present = HAS_LEAGUES
+      ? [...new Set(series.filter((s) => !s.focus).map((s) => s.league))].sort((a, b) => leagueOf(a).level - leagueOf(b).level)
+      : [];
+    const legend = HAS_LEAGUES
+      ? present.map((c) => `<span class="lg-item">${leagueSwatch(c)}${c}</span>`).join('')
+      : series.filter((s) => !s.focus).map((s) => `<span class="lg-item"><span class="lg-line" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
+    chart.appendChild(el(`<div class="lg-legend"><span class="lg-item"><span class="lg-line" style="background:var(--teal)"></span>${esc(focus.name)} (fokus)</span>${legend}</div>`));
+    chart.appendChild(el(`<div class="callout">Jokainen viiva on yhden pelaajan kehitys yli ajan${HAS_LEAGUES ? ', väri on nykyinen sarjataso' : ''}. <b>${esc(focus.name)}</b> on korostettu (paksu). Klikkaa viivaa avataksesi pelaajan.${byDate ? ' Ilman ikätietoa käyriä ei voi rinnastaa kehitysvaiheen mukaan, vain kalenteriajassa.' : ''}${truncated ? ` Näytetään ${shown.length} pelaajaa (rajauksessa ${others.length + 1}).` : ''}</div>`));
   } else {
     chart.appendChild(el('<div class="empty">Ei pelaajia tällä rajauksella.</div>'));
   }
@@ -725,35 +870,44 @@ function openTestForm(p, existing) {
   const sm = src.measurements;
   const srcSkips = src.skips || {};
   const today = D.meta.todayIso;
+  /* Blank rather than pre-filled with the previous session's numbers: copying a
+     value forward silently would turn a missing test into a fabricated result. */
   const TF = [
-    { code: 'cmj', label: 'CMJ (kahdella + yksijalka)', fields: [['cmj_b', 'Kahdella', 'cm', sm.cmj.both], ['cmj_r', 'Oikea', 'cm', sm.cmj.right], ['cmj_l', 'Vasen', 'cm', sm.cmj.left]] },
-    { code: 'sj', label: 'Squat Jump', fields: [['sj_b', 'Kahdella', 'cm', sm.sj.both], ['sj_r', 'Oikea', 'cm', sm.sj.right], ['sj_l', 'Vasen', 'cm', sm.sj.left]] },
-    { code: 'sprint30', label: '30 m juoksu', fields: [['sp30', 'Aika', 's', sm.sprint30]] },
-    { code: 'sprint10', label: '10 m kiihdytys', fields: [['sp10', 'Aika', 's', sm.sprint10]] },
-    { code: 'agility505', label: '505-ketteryys', fields: [['ag_r', 'Oikea', 's', sm.agility505.right], ['ag_l', 'Vasen', 's', sm.agility505.left]] },
-    { code: 'ybalance', label: 'Y-tasapaino', fields: [['bal', 'Komposiitti', '%', sm.ybalance]] },
-    { code: 'ankle', label: 'Nilkan liikkuvuus', fields: [['ank_r', 'Oikea', 'cm', sm.ankle.right], ['ank_l', 'Vasen', 'cm', sm.ankle.left]] },
-    { code: 'keiser', label: 'Keiser leg press', fields: [['k1_load', 'Kuorma 1', 'kg', sm.keiser[0].loadKg], ['k1_w', 'Teho 1', 'W', sm.keiser[0].watts], ['k2_load', 'Kuorma 2', 'kg', sm.keiser[1].loadKg], ['k2_w', 'Teho 2', 'W', sm.keiser[1].watts]] },
+    { code: 'cmj',       label: 'CMJ',                      fields: [['cmj_b', 'Kahdella', 'cm'], ['cmj_r', 'Oikea', 'cm'], ['cmj_l', 'Vasen', 'cm']] },
+    { code: 'sj',        label: 'Squat Jump',               fields: [['sj_b', 'Kahdella', 'cm'], ['sj_r', 'Oikea', 'cm'], ['sj_l', 'Vasen', 'cm']] },
+    { code: 'snap',      label: 'Snap Drive, tehohuippu',   fields: [['sn_r', 'Oikea', 'W'], ['sn_l', 'Vasen', 'W']] },
+    { code: 'snapFixed', label: 'Snap Drive, vakiokuorma',  fields: [['sf_load', 'Kuorma', 'kg'], ['sf_r', 'Oikea', 'W'], ['sf_l', 'Vasen', 'W']] },
+    { code: 'keiser',    label: 'Keiser-jalkaprässi (2 jalkaa)', fields: [['k_w', 'Huipputeho', 'W'], ['k_wk', 'Teho / paino', 'W/kg']] },
+    { code: 'legPress',  label: 'Leg press (indeksi)',      fields: [['lp', 'Indeksi', '']] },
   ];
-  const inp = (id, label, unit, val) => `<label class="fld"><span>${label}${unit ? ` <em>${unit}</em>` : ''}</span><input id="f_${id}" type="number" step="any" value="${val == null ? '' : val}"></label>`;
+  const cur = {
+    cmj_b: sm.cmj.both, cmj_r: sm.cmj.right, cmj_l: sm.cmj.left,
+    sj_b: sm.sj.both, sj_r: sm.sj.right, sj_l: sm.sj.left,
+    sn_r: sm.snap.right, sn_l: sm.snap.left,
+    sf_load: sm.snapFixed.loadKg, sf_r: sm.snapFixed.right, sf_l: sm.snapFixed.left,
+    k_w: sm.keiser.watts, k_wk: sm.keiser.wattsPerKg, lp: sm.legPress,
+  };
+  const val = (id) => isEdit ? cur[id] : null;
+
+  const inp = (id, label, unit) => `<label class="fld"><span>${label}${unit ? ` <em>${unit}</em>` : ''}</span><input id="f_${id}" type="number" step="any" value="${val(id) == null ? '' : val(id)}"></label>`;
   const block = (t) => { const sk = srcSkips[t.code]; return `<div class="fgroup">
       <div class="fg-head"><h4>${t.label}</h4><label class="skipbox"><input type="checkbox" id="skip_${t.code}" ${sk ? 'checked' : ''}> ei testattu</label></div>
       <div class="skip-reason" id="rw_${t.code}" ${sk ? '' : 'hidden'}><span>Syy</span><select id="reason_${t.code}">${SKIP_REASONS.map((r) => `<option ${r === sk ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
-      <div class="fg-inputs" id="in_${t.code}">${t.fields.map((f) => inp(f[0], f[1], f[2], f[3])).join('')}</div>
+      <div class="fg-inputs" id="in_${t.code}">${t.fields.map((f) => inp(f[0], f[1], f[2])).join('')}</div>
     </div>`; };
 
   const back = el('<div class="modal-backdrop"></div>');
   const modal = el(`
     <div class="modal">
       <h2>${isEdit ? 'Muokkaa testiä' : 'Lisää testitulokset'}: ${esc(p.name)}</h2>
-      <p class="psub">${isEdit ? 'Korjaa tietoja, esimerkiksi väärä päivämäärä. Muutokset tallentuvat tähän testiin.' : 'Ikä lasketaan päivämäärästä. Tyhjät kentät kopioidaan edellisestä testistä.'} Rastita "ei testattu" jättääksesi testin pois ja merkitäksesi syyn.</p>
+      <p class="psub">${isEdit ? 'Korjaa tietoja, esimerkiksi väärä päivämäärä. Muutokset tallentuvat tähän testiin.' : 'Täytä vain ne testit jotka tehtiin. Tyhjä kenttä tarkoittaa "ei mitattu", ei nollaa.'} Rastita "ei testattu" merkitäksesi syyn.</p>
       <div class="form-grid">
         <div class="fgroup"><h4>Perustiedot</h4>
           <label class="fld"><span>Päivämäärä</span><input id="f_date" type="date" value="${src.date || today}" max="${today}"></label>
-          <label class="fld"><span>Ikä testissä <em>(automaattinen)</em></span><input id="f_age" type="text" readonly></label>
-          <label class="fld"><span>Sarjataso</span><select id="f_league">${D.leagues.map((l) => `<option value="${l.code}" ${l.code === src.league ? 'selected' : ''}>${l.code}</option>`).join('')}</select></label>
-          <label class="fld"><span>Pituus <em>cm</em></span><input id="f_height" type="number" step="any" value="${src.heightCm}"></label>
-          <label class="fld"><span>Paino <em>kg</em></span><input id="f_weight" type="number" step="any" value="${src.weightKg}"></label>
+          ${p.birthDate ? '<label class="fld"><span>Ikä testissä <em>(automaattinen)</em></span><input id="f_age" type="text" readonly></label>' : ''}
+          ${HAS_LEAGUES ? `<label class="fld"><span>Sarjataso</span><select id="f_league">${D.leagues.map((l) => `<option value="${l.code}" ${l.code === src.league ? 'selected' : ''}>${l.code}</option>`).join('')}</select></label>` : ''}
+          <label class="fld"><span>Pituus <em>cm</em></span><input id="f_height" type="number" step="any" value="${isEdit && src.heightCm != null ? src.heightCm : ''}"></label>
+          <label class="fld"><span>Paino <em>kg</em></span><input id="f_weight" type="number" step="any" value="${isEdit && src.weightKg != null ? src.weightKg : ''}"></label>
         </div>
         ${TF.map(block).join('')}
       </div>
@@ -770,8 +924,10 @@ function openTestForm(p, existing) {
     const upd = () => { $('#rw_' + t.code).hidden = !cb.checked; const box = $('#in_' + t.code); box.style.opacity = cb.checked ? '.4' : '1'; box.querySelectorAll('input').forEach((i) => i.disabled = cb.checked); };
     cb.onchange = upd; upd();
   });
-  const gv = (id, fb) => { const v = parseFloat($('#f_' + id).value); return Number.isFinite(v) ? v : fb; };
-  const updateAge = () => { const d = $('#f_date').value; $('#f_age').value = d ? ((parseD(d) - parseD(p.birthDate)) / YEAR).toFixed(1) + ' v' : ''; };
+  /* Empty stays null. Only a number entered by the user becomes a measurement. */
+  const gv = (id) => { const n = $('#f_' + id); if (!n || n.value.trim() === '') return null; const v = parseFloat(n.value); return Number.isFinite(v) ? v : null; };
+  const ageBox = $('#f_age');
+  const updateAge = () => { if (!ageBox) return; const d = $('#f_date').value; ageBox.value = d ? ((parseD(d) - parseD(p.birthDate)) / YEAR).toFixed(1) + ' v' : ''; };
   $('#f_date').oninput = updateAge; updateAge();
 
   const close = () => back.remove();
@@ -780,23 +936,25 @@ function openTestForm(p, existing) {
   $('#f_save').onclick = () => {
     const date = $('#f_date').value;
     if (!date) { alert('Anna päivämäärä.'); return; }
-    const league = $('#f_league').value;
-    const ageYears = Math.round(((parseD(date) - parseD(p.birthDate)) / YEAR) * 10) / 10;
+    const lgSel = $('#f_league');
+    const league = lgSel ? lgSel.value : null;
+    const ageYears = p.birthDate ? Math.round(((parseD(date) - parseD(p.birthDate)) / YEAR) * 10) / 10 : null;
     const skips = {}, skipped = (c) => $('#skip_' + c).checked;
-    const agR = gv('ag_r', sm.agility505.right), agL = gv('ag_l', sm.agility505.left);
     const meas = {
-      cmj: skipped('cmj') ? { both: null, right: null, left: null } : { both: gv('cmj_b', sm.cmj.both), right: gv('cmj_r', sm.cmj.right), left: gv('cmj_l', sm.cmj.left) },
-      sj: skipped('sj') ? { both: null, right: null, left: null } : { both: gv('sj_b', sm.sj.both), right: gv('sj_r', sm.sj.right), left: gv('sj_l', sm.sj.left) },
-      sprint30: skipped('sprint30') ? null : gv('sp30', sm.sprint30),
-      sprint10: skipped('sprint10') ? null : gv('sp10', sm.sprint10),
-      agility505: skipped('agility505') ? { both: null, right: null, left: null } : { both: Math.round(((agR + agL) / 2) * 100) / 100, right: agR, left: agL },
-      ybalance: skipped('ybalance') ? null : gv('bal', sm.ybalance),
-      ankle: skipped('ankle') ? { both: null, right: null, left: null } : { both: null, right: gv('ank_r', sm.ankle.right), left: gv('ank_l', sm.ankle.left) },
-      keiser: skipped('keiser') ? [{ loadKg: null, watts: null }, { loadKg: null, watts: null }] : [{ loadKg: gv('k1_load', sm.keiser[0].loadKg), watts: gv('k1_w', sm.keiser[0].watts) }, { loadKg: gv('k2_load', sm.keiser[1].loadKg), watts: gv('k2_w', sm.keiser[1].watts) }],
+      cmj: skipped('cmj') ? { both: null, right: null, left: null } : { both: gv('cmj_b'), right: gv('cmj_r'), left: gv('cmj_l') },
+      sj: skipped('sj') ? { both: null, right: null, left: null } : { both: gv('sj_b'), right: gv('sj_r'), left: gv('sj_l') },
+      snap: skipped('snap') ? { right: null, left: null } : { right: gv('sn_r'), left: gv('sn_l') },
+      snapFixed: skipped('snapFixed') ? { right: null, left: null, loadKg: null } : { right: gv('sf_r'), left: gv('sf_l'), loadKg: gv('sf_load') },
+      keiser: skipped('keiser') ? { watts: null, wattsPerKg: null } : { watts: gv('k_w'), wattsPerKg: gv('k_wk') },
+      legPress: skipped('legPress') ? null : gv('lp'),
     };
     for (const t of TF) if (skipped(t.code)) skips[t.code] = $('#reason_' + t.code).value;
 
-    const fields = { date, ageYears, heightCm: gv('height', src.heightCm), weightKg: gv('weight', src.weightKg), league, leagueLevel: leagueOf(league).level, measurements: meas, skips };
+    const fields = {
+      date, ageYears, heightCm: gv('height'), weightKg: gv('weight'),
+      league, leagueLevel: league ? leagueOf(league).level : null,
+      measurements: meas, skips,
+    };
     if (isEdit) {
       Object.assign(existing, fields);
       persistOverride(existing.id, fields);
@@ -890,12 +1048,16 @@ function lineChart(points, opts) {
   if (refs.length) {
     const rp = refs.slice().sort((a, b) => a.t - b.t);
     const rpath = rp.map((r, i) => `${i ? 'L' : 'M'}${xToPx(r.t).toFixed(1)},${yToPx(r.y).toFixed(1)}`).join(' ');
-    const rdots = rp.map((r) => `<rect x="${(xToPx(r.t) - 3).toFixed(1)}" y="${(yToPx(r.y) - 3).toFixed(1)}" width="6" height="6" fill="none" stroke="#9aa7b8" stroke-width="1.5"><title>Oman sarjan taso ${r.label || ''}: ${r.y}${opts.unit}</title></rect>`).join('');
+    const rdots = rp.map((r) => `<rect x="${(xToPx(r.t) - 3).toFixed(1)}" y="${(yToPx(r.y) - 3).toFixed(1)}" width="6" height="6" fill="none" stroke="#9aa7b8" stroke-width="1.5"><title>${opts.refLabel || 'Vertailutaso'} ${r.label || ''}: ${r.y}${opts.unit}</title></rect>`).join('');
     refLine = `<path d="${rpath}" fill="none" stroke="#9aa7b8" stroke-width="1.8" stroke-dasharray="5 4" opacity=".85"/>${rdots}`;
   }
   const path = points.map((p, i) => `${i ? 'L' : 'M'}${xToPx(p.t).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ');
   const area = `M${xToPx(points[0].t).toFixed(1)},${H - mg.b} ` + points.map((p) => `L${xToPx(p.t).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ') + ` L${xToPx(points[points.length - 1].t).toFixed(1)},${H - mg.b} Z`;
-  const dots = points.map((p) => `<circle cx="${xToPx(p.t).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="5" fill="${leagueColor(p.s.league)}" stroke="${p.s.flagged ? 'var(--ink)' : 'var(--bg)'}" stroke-width="${p.s.flagged ? 2.5 : 1.5}"><title>${fmtD(p.s.date)} · ${p.y}${opts.unit} · ${p.s.ageYears}v · ${p.s.league}${p.s.flagged ? ' · vamma-ajanjakso' : ''}</title></circle>`).join('');
+  const dots = points.map((p) => {
+    const ctx = [p.s.ageYears == null ? null : p.s.ageYears + 'v', p.s.league, p.s.flagged ? 'vamma-ajanjakso' : null].filter(Boolean);
+    const fill = p.s.league == null ? opts.color : leagueColor(p.s.league);
+    return `<circle cx="${xToPx(p.t).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="5" fill="${fill}" stroke="${p.s.flagged ? 'var(--ink)' : 'var(--bg)'}" stroke-width="${p.s.flagged ? 2.5 : 1.5}"><title>${fmtD(p.s.date)} · ${p.y}${opts.unit}${ctx.length ? ' · ' + ctx.join(' · ') : ''}</title></circle>`;
+  }).join('');
   return el(`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">
     ${spans}${plotFrame(W, H, mg, xTicks, yTk, xToPx, yToPx)}
     <path d="${area}" fill="${opts.color}" opacity="0.08"/><path d="${path}" fill="none" stroke="${opts.color}" stroke-width="2.5"/>${refLine}${dots}</svg>`);
@@ -925,52 +1087,63 @@ function scatterChart(data, opts) {
   const legend = present.map((l, i) => `<g transform="translate(${mg.l + i * 66},${H - 2})"><circle cx="4" cy="-4" r="4" fill="${leagueColor(l.code)}"/><text x="12" y="0" fill="var(--muted)" font-size="10">${l.code}</text></g>`).join('');
   return el(`<svg viewBox="0 0 ${W} ${H + 16}" width="100%" role="img">${plotFrame(W, H, mg, xTicks, yTk, xToPx, yToPx)}${vline}${dots}${legend}</svg>`);
 }
+/* Several series on one frame. `x` is either an age in years or a timestamp,
+   depending on opts.xMode, so the same chart serves age-matched comparison and
+   plain calendar-time trends. */
 function multiLineChart(series, opts) {
   const W = 620, H = 320, mg = { l: 44, r: 16, t: 14, b: 34 };
+  const byDate = opts.xMode === 'date';
   const allPts = series.flatMap((s) => s.points);
-  const xlo = Math.min(...allPts.map((p) => p.age)) - 0.3, xhi = Math.max(...allPts.map((p) => p.age)) + 0.3;
+  if (!allPts.length) return el('<div class="empty">Ei dataa.</div>');
+  const xsAll = allPts.map((p) => p.x);
+  let xlo = Math.min(...xsAll), xhi = Math.max(...xsAll);
+  if (!byDate) { xlo -= 0.3; xhi += 0.3; }
+  if (xhi === xlo) { xhi = xlo + 1; }
   let ylo = Math.min(...allPts.map((p) => p.y)), yhi = Math.max(...allPts.map((p) => p.y));
-  const pad = (yhi - ylo) * 0.12 || 1; ylo -= pad; yhi += pad;
+  const pad = (yhi - ylo) * 0.12 || 1;
+  /* A percentage gap or a power figure cannot be negative; padding below zero
+     would draw axis labels for values that cannot occur. */
+  ylo = opts.zeroFloor === false ? ylo - pad : Math.max(0, ylo - pad);
+  yhi += pad;
   const xToPx = (a) => mg.l + (a - xlo) / (xhi - xlo) * (W - mg.l - mg.r);
   const yToPx = (v) => H - mg.b - (v - ylo) / (yhi - ylo) * (H - mg.t - mg.b);
-  const step = (xhi - xlo) <= 6 ? 1 : 2;
+
   const xTicks = [];
-  for (let v = Math.ceil(xlo); v <= xhi; v += step) xTicks.push({ v, label: v + 'v' });
+  if (byDate) {
+    const stamps = [...new Set(xsAll)].sort((a, b) => a - b);
+    const stride = Math.ceil(stamps.length / 6);
+    stamps.forEach((t, i) => {
+      if (i % stride === 0 || i === stamps.length - 1) {
+        const d = new Date(t);
+        xTicks.push({ v: t, label: `${d.getUTCDate()}.${d.getUTCMonth() + 1}.` });
+      }
+    });
+  } else {
+    const step = (xhi - xlo) <= 6 ? 1 : 2;
+    for (let v = Math.ceil(xlo); v <= xhi; v += step) xTicks.push({ v, label: v + 'v' });
+  }
   const yTk = ticks(ylo + pad * 0.3, yhi - pad * 0.3, 4);
 
   const lines = series.filter((s) => !s.focus).map((s) => {
-    const pts = s.points.slice().sort((a, b) => a.age - b.age);
-    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${xToPx(p.age).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ');
-    return `<g><path d="${d}" fill="none" stroke="${leagueColor(s.league)}" stroke-width="1.8" opacity="0.6"/>`
-      + `<path data-pid="${s.pid}" d="${d}" fill="none" stroke="transparent" stroke-width="12"><title>${esc(s.name)} (${s.league})</title></path></g>`;
+    const pts = s.points.slice().sort((a, b) => a.x - b.x);
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${xToPx(p.x).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ');
+    const col = s.color || (s.league == null ? '#8896ab' : leagueColor(s.league));
+    const dots = s.showDots ? pts.map((p) => `<circle cx="${xToPx(p.x).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="3.5" fill="${col}" stroke="var(--bg)" stroke-width="1.2"/>`).join('') : '';
+    return `<g><path d="${d}" fill="none" stroke="${col}" stroke-width="${s.showDots ? 2.2 : 1.8}" opacity="${s.showDots ? 0.95 : 0.6}"/>${dots}`
+      + `<path data-pid="${s.pid || ''}" d="${d}" fill="none" stroke="transparent" stroke-width="12"><title>${esc(s.name)}${s.league ? ` (${s.league})` : ''}</title></path></g>`;
   }).join('');
   const f = series.find((s) => s.focus);
   let focusLine = '';
   if (f) {
-    const pts = f.points.slice().sort((a, b) => a.age - b.age);
-    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${xToPx(p.age).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ');
-    const dots = pts.map((p) => `<circle cx="${xToPx(p.age).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="4" fill="var(--teal)" stroke="var(--bg)" stroke-width="1.5"><title>${esc(f.name)} · ${p.age}v · ${p.y}${opts.unit}</title></circle>`).join('');
-    focusLine = `<path data-pid="${f.pid}" d="${d}" fill="none" stroke="var(--teal)" stroke-width="3"/>${dots}`;
+    const pts = f.points.slice().sort((a, b) => a.x - b.x);
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${xToPx(p.x).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ');
+    const lbl = (p) => byDate ? fmtD(p.s.date) : p.x + 'v';
+    const dots = pts.map((p) => `<circle cx="${xToPx(p.x).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="4" fill="var(--teal)" stroke="var(--bg)" stroke-width="1.5"><title>${esc(f.name)} · ${lbl(p)} · ${p.y}${opts.unit}</title></circle>`).join('');
+    focusLine = `<path data-pid="${f.pid || ''}" d="${d}" fill="none" stroke="var(--teal)" stroke-width="3"/>${dots}`;
   }
   return el(`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${plotFrame(W, H, mg, xTicks, yTk, xToPx, yToPx)}${lines}${focusLine}</svg>`);
 }
 
-function fvpChart(k) {
-  const W = 320, H = 180, mg = { l: 40, r: 16, t: 14, b: 28 };
-  const loads = k.map((d) => d.loadKg), watts = k.map((d) => d.watts);
-  const xlo = Math.min(...loads) * 0.9, xhi = Math.max(...loads) * 1.05, ylo = 0, yhi = Math.max(...watts) * 1.15;
-  const xToPx = (l) => mg.l + (l - xlo) / (xhi - xlo) * (W - mg.l - mg.r);
-  const yToPx = (v) => H - mg.b - (v - ylo) / (yhi - ylo) * (H - mg.t - mg.b);
-  const path = k.map((d, i) => `${i ? 'L' : 'M'}${xToPx(d.loadKg).toFixed(1)},${yToPx(d.watts).toFixed(1)}`).join(' ');
-  const dots = k.map((d) => `<g><circle cx="${xToPx(d.loadKg).toFixed(1)}" cy="${yToPx(d.watts).toFixed(1)}" r="5" fill="var(--green)"/><text x="${xToPx(d.loadKg).toFixed(1)}" y="${yToPx(d.watts) - 10}" fill="var(--ink)" font-size="11" text-anchor="middle" font-weight="700">${d.watts}</text></g>`).join('');
-  const xlab = k.map((d) => `<text x="${xToPx(d.loadKg).toFixed(1)}" y="${H - 8}" fill="var(--muted)" font-size="10" text-anchor="middle">${d.loadKg} kg</text>`).join('');
-  return el(`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"><line x1="${mg.l}" y1="${yToPx(0)}" x2="${W - mg.r}" y2="${yToPx(0)}" stroke="var(--line)"/><path d="${path}" fill="none" stroke="var(--green)" stroke-width="2.5"/>${dots}${xlab}</svg>`);
-}
-
-/* =========================================================================
-   ANALYSIS REPORT (printable HTML, deterministic from the data)
-   ========================================================================= */
-/* light-theme development curve for the printable report (returns SVG string) */
 function reportCurve(points, refPoints) {
   const W = 560, H = 190, mg = { l: 36, r: 14, t: 12, b: 24 };
   const refs = (refPoints || []).filter((r) => r.y != null);
@@ -989,7 +1162,7 @@ function reportCurve(points, refPoints) {
     refLine = `<path d="${rp.map((r, i) => `${i ? 'L' : 'M'}${xToPx(r.t).toFixed(1)},${yToPx(r.y).toFixed(1)}`).join(' ')}" fill="none" stroke="#c4bcae" stroke-width="1.6" stroke-dasharray="5 4"/>`;
   }
   const line = `<path d="${points.map((p, i) => `${i ? 'L' : 'M'}${xToPx(p.t).toFixed(1)},${yToPx(p.y).toFixed(1)}`).join(' ')}" fill="none" stroke="#6f9c8f" stroke-width="2.4"/>`;
-  const dots = points.map((p) => `<circle cx="${xToPx(p.t).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="4.5" fill="${leagueColor(p.s.league)}" stroke="${p.s.flagged ? '#b06a5d' : '#faf8f4'}" stroke-width="${p.s.flagged ? 2.5 : 1.5}"/>`).join('');
+  const dots = points.map((p) => `<circle cx="${xToPx(p.t).toFixed(1)}" cy="${yToPx(p.y).toFixed(1)}" r="4.5" fill="${p.s.league == null ? '#6f9c8f' : leagueColor(p.s.league)}" stroke="${p.s.flagged ? '#b06a5d' : '#faf8f4'}" stroke-width="${p.s.flagged ? 2.5 : 1.5}"/>`).join('');
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${grid}${xt}${refLine}${line}${dots}</svg>`;
 }
 
@@ -1010,10 +1183,15 @@ function renderReport(pid, sid) {
   const activeInjury = injuries.length > 0;
   const otherEvents = p.annotations.filter((a) => a.type !== 'injury' && a.startDate <= session.date && (a.endDate == null || a.endDate >= intervalStart));
 
-  const rows = METRICS.map((m) => {
-    const now = m.get(session), prevV = prev ? m.get(prev) : null, base = m.get(first(p));
+  /* Only tests this session actually carries, and compare each against the last
+     session that measured it rather than the immediately preceding session. */
+  const prevWith = (m) => { for (let i = idx - 1; i >= 0; i--) if (m.get(sessions[i]) != null) return sessions[i]; return null; };
+  const firstWith = (m) => { for (const q of sessions) if (m.get(q) != null) return q; return null; };
+  const rows = METRICS.filter((m) => m.get(session) != null).map((m) => {
+    const pv = prevWith(m), fv = firstWith(m);
+    const now = m.get(session), prevV = pv ? m.get(pv) : null, base = fv ? m.get(fv) : null;
     const peers = matchedValuesAtAgeLeague(session.ageYears, session.league, m, p.id);
-    return { m, now, prevV, base, cP: chg(m, prev), cB: chg(m, first(p)), pc: percentileRank(now, peers, m.hb), nPeers: peers.length };
+    return { m, now, prevV, base, prevS: pv, cP: chg(m, pv), cB: chg(m, fv === session ? null : fv), pc: percentileRank(now, peers, m.hb), nPeers: peers.length };
   });
 
   const cmj = mm.cmj;
@@ -1022,8 +1200,9 @@ function renderReport(pid, sid) {
   const ssc = hasCmj && hasSj ? ((cmj.both - mm.sj.both) / mm.sj.both) * 100 : null;
   const asymCmj = hasCmj ? Math.abs(cmj.right - cmj.left) / ((cmj.right + cmj.left) / 2) * 100 : null;
   const weakSide = hasCmj && cmj.right < cmj.left ? 'oikea' : 'vasen';
-  const ankleAsym = mm.ankle.right != null && mm.ankle.left != null ? Math.abs(mm.ankle.right - mm.ankle.left) : null;
-  const cmjRow = rows.find((r) => r.m.code === 'cmj');
+  const snapAsym = mm.snap.right != null && mm.snap.left != null ? Math.abs(mm.snap.right - mm.snap.left) / ((mm.snap.right + mm.snap.left) / 2) * 100 : null;
+  /* Head-line metric: CMJ when measured, otherwise whatever this session has. */
+  const headRow = rows.find((r) => r.m.code === 'cmj') || rows[0] || null;
 
   // overall verdict from average change vs baseline
   const cbVals = rows.map((r) => r.cB).filter((v) => v != null);
@@ -1051,7 +1230,7 @@ function renderReport(pid, sid) {
   rows.forEach((r) => { if (r.cP != null && r.cP < -3) devAreas.push(`${r.m.label}: ${r.cP.toFixed(1)} % edellisestä${activeInjury ? ', loukkaantuminen huomioiden' : ''}`); });
   if (asymCmj != null && asymCmj > 8) devAreas.push(`Sivuasymmetria ${asymCmj.toFixed(1)} % (tavoite alle 5 %), heikompi ${weakSide}`);
   if (ssc != null && ssc < 3) devAreas.push('Matala elastisuus (SSC)');
-  if (ankleAsym != null && ankleAsym > 1.5) devAreas.push('Nilkan liikkuvuuden sivuero');
+  if (snapAsym != null && snapAsym > 8) devAreas.push(`Snap Drive -sivuasymmetria ${snapAsym.toFixed(1)} % (tavoite alle 5 %)`);
   const devU = [...new Set(devAreas)].slice(0, 5);
   if (!devU.length) devU.push('Ei merkittäviä kehityskohteita tässä testissä.');
 
@@ -1059,8 +1238,8 @@ function renderReport(pid, sid) {
   if (activeInjury) recs.push('Hallittu progressio: vältä maksimikuormia ja kovia iskutuksia kunnes oireet ovat rauhoittuneet. Painota kuormituksen seurantaa.');
   if (asymCmj != null && asymCmj > 8) recs.push(`Yksijalkaharjoittelu heikommalle puolelle (${weakSide}): lateraaliset loikat ja yhden jalan plyometria.`);
   if (ssc != null && ssc < 3) recs.push('Elastisuuden kehitys: reaktiiviset hypyt ja plyometria matalalla kontaktiajalla.');
-  if (cmjRow.pc != null && cmjRow.pc < 40) recs.push('Räjähtävän voiman pohja: hallittu voimaharjoittelu ikätasolla ja hyppytekniikka.');
-  if (ankleAsym > 1.5) recs.push('Nilkan liikkuvuuden tasapainotus: liikkuvuusharjoittelu heikommalle nilkalle.');
+  if (headRow && headRow.pc != null && headRow.pc < 40) recs.push('Räjähtävän voiman pohja: hallittu voimaharjoittelu ikätasolla ja hyppytekniikka.');
+  if (snapAsym != null && snapAsym > 8) recs.push('Yhden jalan tehon tasapainotus: kohdennettu snap drive -työ heikommalle puolelle.');
   recs.push('Jatkuvuus ja terveys: säännöllinen seuranta ja riittävä palautuminen tukevat kehitystä.');
 
   const ctxItems = [
@@ -1071,11 +1250,15 @@ function renderReport(pid, sid) {
   const fmtChg = (c) => c == null ? '<span class="rp-mut">-</span>' : `<span class="${c > 1.5 ? 'rp-up' : c < -1.5 ? 'rp-down' : 'rp-mut'}">${c > 0 ? '+' : ''}${c.toFixed(1)} %</span>`;
 
   // development chart (CMJ) with the shifting own-league benchmark
-  const cm = metric('cmj');
-  const cpts = p.sessions.map((s) => ({ t: parseD(s.date).getTime(), y: s.measurements.cmj.both, s })).filter((pt) => pt.y != null);
-  const crefs = p.sessions.map((s) => { const v = matchedValuesAtAgeLeague(s.ageYears, s.league, cm, p.id); return { t: parseD(s.date).getTime(), y: v.length ? Math.round((v.reduce((a, c) => a + c, 0) / v.length) * 10) / 10 : null }; });
-  const chartLeagues = [...new Set(p.sessions.map((s) => s.league))].sort((a, b) => leagueOf(a).level - leagueOf(b).level);
-  const chartLegend = `<div class="rp-legend"><span class="lg-item"><span class="lg-line" style="background:#6f9c8f"></span>oma CMJ</span><span class="lg-item"><span class="lg-line dashed"></span>oman sarjan taso</span>${chartLeagues.map((c) => `<span class="lg-item">${leagueSwatch(c)}${esc(c)}</span>`).join('')}</div>`;
+  const cm = headRow ? headRow.m : metric('cmj');
+  const cpts = p.sessions.map((s) => ({ t: parseD(s.date).getTime(), y: cm.get(s), s })).filter((pt) => pt.y != null);
+  const ownBase = p.baseline2025 ? p.baseline2025[cm.code] : null;
+  const crefs = HAS_PEERS
+    ? p.sessions.map((s) => { const v = matchedValuesAtAgeLeague(s.ageYears, s.league, cm, p.id); return { t: parseD(s.date).getTime(), y: v.length ? Math.round((v.reduce((a, c) => a + c, 0) / v.length) * 10) / 10 : null }; })
+    : (ownBase == null ? [] : cpts.map((pt) => ({ t: pt.t, y: ownBase })));
+  const refName = HAS_PEERS ? 'oman sarjan taso' : 'kauden 2025 taso';
+  const chartLeagues = HAS_LEAGUES ? [...new Set(p.sessions.map((s) => s.league).filter(Boolean))].sort((a, b) => leagueOf(a).level - leagueOf(b).level) : [];
+  const chartLegend = `<div class="rp-legend"><span class="lg-item"><span class="lg-line" style="background:#6f9c8f"></span>oma ${esc(cm.label)}</span>${crefs.length ? `<span class="lg-item"><span class="lg-line dashed"></span>${refName}</span>` : ''}${chartLeagues.map((c) => `<span class="lg-item">${leagueSwatch(c)}${esc(c)}</span>`).join('')}</div>`;
 
   const container = el('<div class="report"></div>');
   const actions = el('<div class="report-actions no-print"></div>');
@@ -1094,17 +1277,19 @@ function renderReport(pid, sid) {
           <div class="rp-kicker">SBAQ-analyysi</div>
         </div>
         <div class="rp-meta">
-          <div>${session.ageYears} v · ${esc(p.position)}</div>
-          <div>${session.heightCm} cm · ${session.weightKg} kg · ${session.league}</div>
+          ${[session.ageYears == null ? null : session.ageYears + ' v', p.position].filter(Boolean).length ? `<div>${[session.ageYears == null ? null : session.ageYears + ' v', esc(p.position || '')].filter(Boolean).join(' · ')}</div>` : ''}
+          ${[session.heightCm == null ? null : session.heightCm + ' cm', session.weightKg == null ? null : session.weightKg + ' kg', session.league].filter(Boolean).length ? `<div>${[session.heightCm == null ? null : session.heightCm + ' cm', session.weightKg == null ? null : session.weightKg + ' kg', session.league].filter(Boolean).join(' · ')}</div>` : ''}
           <div>Testipäivä ${fmtDLong(session.date)}</div>
         </div>
       </header>
 
       <section><h4>Tiivistelmä</h4>
         <div class="rp-tldr">
-          <div class="rp-cardlet"><div class="k">CMJ nyt</div><div class="v">${cmjRow.now == null ? '-' : cmjRow.now.toFixed(1) + ' cm'}</div><div class="s">vs edellinen ${fmtChg(cmjRow.cP)}</div></div>
+          <div class="rp-cardlet"><div class="k">${headRow ? esc(headRow.m.label) : 'Tulos'} nyt</div><div class="v">${!headRow || headRow.now == null ? '-' : num(headRow.now, headRow.m.unit) + ' ' + headRow.m.unit}</div><div class="s">vs edellinen ${fmtChg(headRow && headRow.cP)}</div></div>
           <div class="rp-cardlet"><div class="k">Suurin kehitys</div><div class="v">${bestB ? '+' + bestB.cB.toFixed(1) + ' %' : '-'}</div><div class="s">${bestB ? esc(bestB.m.label) : 'lähtötasosta'}</div></div>
-          <div class="rp-cardlet"><div class="k">CMJ sarjassa ${esc(session.league)}</div><div class="v">${cmjRow.pc == null ? '-' : cmjRow.pc + '.'}</div><div class="s">percentiili${cmjRow.pc == null ? ', liian pieni joukko' : ' (' + cmjRow.nPeers + ' vertailtavaa)'}</div></div>
+          ${HAS_PEERS && headRow
+            ? `<div class="rp-cardlet"><div class="k">${esc(headRow.m.label)} sarjassa ${esc(session.league)}</div><div class="v">${headRow.pc == null ? '-' : headRow.pc + '.'}</div><div class="s">percentiili${headRow.pc == null ? ', liian pieni joukko' : ' (' + headRow.nPeers + ' vertailtavaa)'}</div></div>`
+            : `<div class="rp-cardlet"><div class="k">Mitattu</div><div class="v">${rows.length}</div><div class="s">testiä tällä kerralla</div></div>`}
           <div class="rp-cardlet"><div class="k">Kehitys lähtötasosta</div><div class="v">${avgCb == null ? '-' : (avgCb > 0 ? '+' : '') + avgCb.toFixed(1) + ' %'}</div><div class="s">keskimäärin testeittäin</div></div>
         </div>
         <div class="rp-verdict"><b>Kokonaisarvio:</b> ${verdict}</div>
@@ -1112,11 +1297,11 @@ function renderReport(pid, sid) {
 
       ${ctxItems.length ? `<section><h4>Konteksti</h4><ul class="rp-list">${ctxItems.join('')}</ul></section>` : ''}
 
-      ${cpts.length >= 2 ? `<section><h4>Kehityskaari (CMJ)</h4><div class="rp-chart">${reportCurve(cpts, crefs)}</div>${chartLegend}</section>` : ''}
+      ${cpts.length >= 2 ? `<section><h4>Kehityskaari (${esc(cm.label)})</h4><div class="rp-chart">${reportCurve(cpts, crefs)}</div>${chartLegend}</section>` : ''}
 
       <section><h4>Kehitys testeittäin</h4>
         <table class="rp-table">
-          <thead><tr><th>Testi</th><th>Lähtö</th><th>Edellinen</th><th>Nyt</th><th>vs edellinen</th><th>vs lähtö</th><th>Percentiili (${esc(session.league)})</th></tr></thead>
+          <thead><tr><th>Testi</th><th>Lähtö</th><th>Edellinen</th><th>Nyt</th><th>vs edellinen</th><th>vs lähtö</th>${HAS_PEERS ? `<th>Percentiili (${esc(session.league)})</th>` : ''}</tr></thead>
           <tbody>
           ${rows.map((r) => `<tr>
             <td>${esc(r.m.label)} <span class="rp-mut">${r.m.unit}</span></td>
@@ -1125,7 +1310,7 @@ function renderReport(pid, sid) {
             <td><b>${num(r.now, r.m.unit)}</b></td>
             <td>${fmtChg(r.cP)}</td>
             <td>${fmtChg(r.cB)}</td>
-            <td>${r.pc == null ? '<span class="rp-mut">-</span>' : r.pc + '.'}</td>
+            ${HAS_PEERS ? `<td>${r.pc == null ? '<span class="rp-mut">-</span>' : r.pc + '.'}</td>` : ''}
           </tr>`).join('')}
           </tbody>
         </table>
@@ -1136,8 +1321,8 @@ function renderReport(pid, sid) {
           <li>SSC eli elastisuus (CMJ vs SJ): <b>${ssc == null ? '-' : ssc.toFixed(1) + ' %'}</b> <span class="rp-mut">(optimi +10...15 %)</span></li>
           <li>Bilateraalinen suhde: <b>${hasCmj ? (cmj.both / (cmj.right + cmj.left)).toFixed(2) : '-'}</b> <span class="rp-mut">(normaali 0,90...1,10)</span></li>
           <li>CMJ-sivuasymmetria: <b>${asymCmj == null ? '-' : asymCmj.toFixed(1) + ' %'}</b> <span class="rp-mut">(optimi alle 5 %)</span></li>
-          <li>Keiser FVP-suhde: <b>${mm.keiser[0].watts == null || mm.keiser[1].watts == null ? '-' : (mm.keiser[0].watts / mm.keiser[1].watts).toFixed(2)}</b>, suhteellinen teho <b>${mm.keiser[0].watts == null ? '-' : (mm.keiser[0].watts / session.weightKg).toFixed(1) + ' W/kg'}</b></li>
-          <li>Nilkan sivuero: <b>${ankleAsym == null ? '-' : ankleAsym.toFixed(1) + ' cm'}</b> <span class="rp-mut">(tavoite alle 1,5 cm)</span></li>
+          <li>Snap Drive -sivuasymmetria: <b>${snapAsym == null ? '-' : snapAsym.toFixed(1) + ' %'}</b> <span class="rp-mut">(optimi alle 5 %)</span></li>
+          <li>Keiser, teho suhteessa painoon: <b>${mm.keiser.wattsPerKg == null ? '-' : mm.keiser.wattsPerKg.toFixed(1) + ' W/kg'}</b> <span class="rp-mut">${mm.keiser.watts == null ? '' : '(' + mm.keiser.watts + ' W)'}</span></li>
         </ul>
       </section>
 
@@ -1171,6 +1356,10 @@ function render() {
 
 /* ---------- boot ---------- */
 mergeAll();
-$('#pcount').textContent = D.meta.playerCount;
+/* Say which dataset is loaded. Real measurements and a synthetic demo must
+   never be mistaken for one another. */
+$('#dataNote').textContent = D.meta.dataset === 'real'
+  ? `Oikeat mittaustulokset (${D.meta.playerCount} pelaajaa, ${D.players.reduce((a, p) => a + p.sessions.length, 0)} testikertaa) · nimet pseudonymisoitu · numerot lasketaan datasta`
+  : `Demo · synteettinen data (${D.meta.playerCount} pelaajaa) · numerot lasketaan datasta, eivät ole oikeita henkilöitä`;
 initRole();
 render();

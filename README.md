@@ -1,15 +1,12 @@
-# SBAQ, testialusta (demo)
+# SBAQ, testialusta
 
-Prototyyppi jääkiekkoilijoiden (ja muiden urheilijoiden) testitulosten syöttöön,
+Työkalu jääkiekkoilijoiden (ja muiden urheilijoiden) testitulosten syöttöön,
 tallennukseen, seurantaan ja vertailuun. **SBAQ = Speed · Balance · Agility · Quickness.**
 
-Tämä on selaimessa toimiva demo synteettisellä datalla. Tarkoitus on näyttää,
-miltä valmis työkalu käytännössä näyttäisi. Numerot lasketaan datasta; pelaajat
-eivät ole oikeita henkilöitä.
+Selaimessa toimiva, riippumaton kaikista kirjastoista. Kaksi osaa: julkinen
+esittelysivu ja sen takana varsinainen työkalu.
 
 ## Käynnistys
-
-Riippumaton kaikista kirjastoista. Palvele kansio staattisesti:
 
 ```bash
 python3 -m http.server 8199
@@ -17,78 +14,102 @@ python3 -m http.server 8199
 # työkalu:       http://localhost:8199/app/
 ```
 
-(Claude Code: käynnistyy myös `launch.json` konfiguraatiolla `sbaq-demo`.)
-
 ## Tiedostot
 
 | Tiedosto | Rooli |
 |---|---|
 | `index.html`, `site.css` | Julkinen esittelysivu (etusivu) |
-| `app/generate.mjs` | Synteettisen datan generaattori (Node). Aja `node app/generate.mjs`, syntyy `app/data.js` |
-| `app/data.js` | Aineisto (`window.SBAQ_DATA`), 50 pelaajaa, 375 testiä |
-| `app/index.html`, `app/styles.css`, `app/main.js` | Dashboard (lista, pelaajanäkymä, vertailu) |
+| `app/index.html`, `app/styles.css`, `app/main.js` | Dashboard (lista, pelaajanäkymä, vertailu, raportti) |
+| `app/data.js` | **Käytössä oleva aineisto** (`window.SBAQ_DATA`). Generoitu tiedostosta `build-real-data.mjs` |
+| `app/build-real-data.mjs` | Oikeat mittaustulokset -> `app/data.js`. Aja `node app/build-real-data.mjs` |
+| `app/generate.mjs` | Synteettisen demodatan generaattori -> `app/data-demo.js` (ei käytössä oletuksena) |
 
-## Mitä demo näyttää
+## Data
 
-- **Pelaajalista.** Suodatus iän, sarjan ja tilanteen mukaan, lajittelu, haku.
-- **Pelaajanäkymä.** Kehityskaari yli ajan (pisteet väritetty sen sarjan mukaan
-  jossa pelaaja kunakin testinä pelasi, ja katkoviivana oman sarjan keskitaso
-  joka vaihtuu sarjanousun myötä), merkinnät ja loukkaantumiset aikajanalla,
-  testikerrat päivämäärittäin (auki klikkaamalla näkee kaikki tulokset sekä
-  pituuden, painon ja sarjatason kyseisen testin aikaan), sarjakohtainen
-  vertailu (jokainen testi verrattuna siihen sarjaan jossa silloin pelasi),
-  Keiser FVP-profiili, kokoava taulukko ja SBAQ-suhdeluvut. Jokaisella sarjalla
-  on oma erottuva värinsä läpi sovelluksen.
-- **Uusien tulosten lisäys.** Nappi "Lisää testitulokset" avaa lomakkeen. Uusi
-  testi tallentuu selaimen localStorageen ja päivittyy heti näkymiin.
-- **Tulostettava analyysi.** Jokaisesta testistä saa "Analyysi ja tulostus"
-  -napista (tai testikerran "Raportti"-linkistä) HTML-raportin, joka vertaa
-  edelliseen ja lähtötasoon, huomioi loukkaantumisten vaikutuksen ja antaa
-  suositukset. Tulostettavissa PDF:ksi selaimen tulostustoiminnolla. Tämä on
-  demossa deterministinen luonnos; lopullisessa versiossa AI täydentää narratiivin.
-- **Vertailu (pelaajakohtainen).** Valitaan fokuspelaaja, pelipaikka ja sarja.
-  Kaksi tilaa:
-  - *Hajonta vertailuikänä:* jokaisesta pelaajasta se testi joka on lähimpänä
-    valittua vertailuikää, joten esim. 22-vuotiaasta näkyy tulos jonka hän teki
-    18-vuotiaana. Väri on sarjataso kyseisen testin aikaan.
-  - *Kehityskaari yli ajan:* usean pelaajan kehityskäyrät samassa diagrammissa,
-    fokuspelaaja korostettuna.
-  Datapistettä tai käyrää klikkaamalla avautuu kyseinen pelaaja. Pelipaikka on
-  suodatin (esim. maalivahdit, U20-SM, ikä 18).
-- **Roolit.** "Ylläpitäjä näkee kaiken ja voi lisätä" vs. "Pelaaja näkee vain
-  omansa" (demo-valitsin ylhäällä).
+Aineisto on **oikeita mittaustuloksia** kevään ja kesän 2026 testijaksolta:
+kaksi pelaajaa, 20 testikertaa. **Pelaajien nimet on pseudonymisoitu**,
+mittausarvot ovat alkuperäisiä.
+
+Lähde on kaksi kehitysraporttia, joiden kuvaajat ovat rasterikuvia. Arvot on
+otettu kuvaajiin merkityistä lukuarvoista, ja merkitsemättömät sarjat on purettu
+pikselianalyysillä. Lukija validoitiin merkittyjä sarjoja vasten, ja poikkeama
+oli alle 0,03 cm / 1 W.
+
+**Mitä lähteessä ei ole**, eikä siis ole täällä keksittynä: syntymäaika, ikä,
+pituus, pelipaikka, sarjataso per testikerta, sekä painot muualta kuin niistä
+kohdista joissa raportti ne kertoo. Sovellus tunnistaa nämä puutteet
+(`meta.hasAges`, `meta.hasLeagues`) ja piilottaa ikään ja sarjatasoon nojaavat
+näkymät sen sijaan että näyttäisi tyhjiä tai harhaanjohtavia lukuja.
+
+Demodataan voi vaihtaa ajamalla `node app/generate.mjs` ja osoittamalla
+`app/index.html`:n script-tagi tiedostoon `data-demo.js`.
+
+## Testipatteristo
+
+| Testi | Yksikkö | Puolet |
+|---|---|---|
+| CMJ (kahdella ja yhdellä) | cm | kyllä |
+| Squat Jump (kahdella ja yhdellä) | cm | kyllä |
+| Single Leg Snap Drive, tehohuippu | W | kyllä |
+| Snap Drive, vakiokuorma | W | kyllä |
+| Keiser-jalkaprässi (2 jalkaa) | W ja W/kg | ei |
+| Leg press | indeksi | ei |
+
+Sport Labin täysi patteristo kattaa lisäksi hapenottotestin, valokennomittaukset
+salilla ja jäällä sekä valoreaktiotestit. Ne tulevat mukaan, kun aineistoa on.
+
+## Mitä työkalu näyttää
+
+- **Pelaajalista.** Haku, suodatus ja lajittelu. Ikä- ja sarjasuodattimet
+  näkyvät vain jos aineistossa on ne tiedot.
+- **Pelaajanäkymä.** Kehityskaari yli ajan, vertailutasona pelaajan oma
+  edellisen kauden taso (tai sarjan keskitaso, jos vertailujoukko on olemassa).
+  Merkinnät aikajanalla, testikerrat päivämäärittäin, puolierot ja niiden
+  kehitys, kokoava taulukko ja SBAQ-suhdeluvut.
+- **Uusien tulosten lisäys.** Tyhjä kenttä tarkoittaa "ei mitattu", ei nollaa.
+  Uusi testi tallentuu selaimen localStorageen.
+- **Tulostettava analyysi.** Raportti vertaa edelliseen kertaan ja lähtötasoon,
+  huomioi merkinnät ja antaa suositukset. Deterministinen luonnos; lopullisessa
+  versiossa AI täydentää narratiivin.
+- **Vertailu.** Usean pelaajan kehityskäyrät samassa diagrammissa. Ikä-täsmätty
+  hajontanäkymä vaatii ikätiedot, ja piiloutuu ilman niitä.
+- **Roolit.** Ylläpitäjä näkee kaiken ja voi lisätä, pelaaja näkee vain omansa.
 
 ## Datamalli (ydin)
 
 ```
-player      : id, nimi, syntymäaika, pelipaikka, currentLeague, annotations[], sessions[]
-session     : pvm, ikä, pituus, paino, sarja+taso, measurements{}   (ikä, pituus, paino JOKA testissä)
-annotation  : tyyppi (injury/growth/illness/position/...), aikajakso, vakavuus, kuvaus
-measurement : cmj/sj (both+O/V), sprint30/10, agility505, ybalance, ankle(O/V), keiser[{load,watts}]
+player      : id, nimi, syntymäaika?, pelipaikka?, currentLeague?, baseline2025?,
+              notes[], annotations[], sessions[]
+session     : pvm, ikä?, pituus?, paino?, sarja+taso?, measurements{}
+annotation  : tyyppi (injury/growth/illness/position/training/...), aikajakso, title, note
+measurement : cmj/sj {both,right,left}, snap {right,left},
+              snapFixed {right,left,loadKg}, keiser {watts,wattsPerKg}, legPress
 ```
 
-## Realismimalli (generaattori)
+`?` = voi olla `null`. Puuttuva mittaus on `null`, ei nolla.
 
-Testitulokset syntyvät funktiona: **ikä (maturaatio) + sarjataso + yksilöllinen
-lahjakkuus + kehitystrendi + kohina.** Lisäksi jokaisella pelaajalla on yksi
-kehityskaari-skenaario (steady, plateau, late_bloomer, early_plateau, breakout,
-injury_dip, setback), joka taivuttaa dataa. Loukkaantumisjaksot näkyvät
-notkahduksina. Tulokset paranevat iän ja sarjatason myötä, mutta hajonta on
-tarkoituksellista.
+## Synteettinen demodata (generate.mjs)
 
-**Sarjataso ei määräydy iästä.** Se valitaan per testi pelaajan lahjakkuuden ja
-iän mukaan, junnusarjojen yläikärajoja noudattaen (U15 max 15, U16 max 16,
-U18-SM max 18, U20-SM max 20; Liigaan 16-vuotiaasta). Lahjakas nuori voi pelata
-Mestiksessä, Liigassa, AHL:ssä tai NHL:ssä. Testihistorian pituus vaihtelee:
-osa pelaajista on aloittanut testauksen vasta hiljattain (1 testi), osalla on
-pitkä historia (jopa 11 testiä).
-
-Sarjat (taso järjestyksessä): U15-SM, U16-SM, U18-SM, U20-SM, Mestis, OHL,
-NCAA, Liiga, AHL, NHL.
+Vanha demogeneraattori on tallella. Se tuottaa 50 pelaajaa, joilla on ikä ja
+sarjataso jokaisessa testissä, ja jotka käyttävät demon alkuperäistä
+patteristoa (30 m juoksu, Y-tasapaino, nilkan liikkuvuus, Keiser-kuormaprofiili).
+Nykyinen `main.js` on kirjoitettu oikean patteriston mukaan, joten demodata
+vaatisi generaattorin päivittämisen samaan mittausmalliin ennen kuin se toimii.
 
 ## Seuraavat vaiheet (ei vielä toteutettu)
 
-1. **AI-raporttiputki.** Laske numerot datasta, Claude API kirjoittaa tulkinnan,
-   renderöi näytekuvien tyylinen deck tai PDF.
-2. **Viitearvot.** Julkaistut normit ja kokemusarvot `benchmarks`-tauluun.
-3. **Tallennus ja kirjautuminen.** Supabase (Postgres, Auth, roolit), deploy verkkoon.
+1. **Taustatiedot testikertoihin.** Ikä, pituus, paino ja sarjataso jokaiselle
+   testikerralle. Ne avaavat ikä- ja sarjavertailut, jotka ovat nyt piilossa.
+2. **Loput Sport Labin patteristosta.** Hapenottotesti, valokennot salilla ja
+   jäällä, valoreaktiotestit.
+3. **Viitearvot.** Julkaistut normit ja kokemusarvot `benchmarks`-tauluun.
+   Huom: eri testiprotokollien W/kg-lukuja ei voi verrata keskenään.
+4. **AI-raporttiputki.** Laske numerot datasta, Claude API kirjoittaa tulkinnan.
+5. **Tallennus ja kirjautuminen.** Supabase (Postgres, Auth, roolit).
+
+## Tietosuoja
+
+Repo on julkinen. Aineistossa on oikeita mittaustuloksia, joten **nimet on
+pseudonymisoitu** eikä tunnistavia taustatietoja (seura, joukkue, leirit,
+turnaukset) ole viety mukaan. Jos aineistoon lisätään syntymäajat tai muuta
+yksilöivää tietoa, repo on syytä muuttaa privaatiksi ensin.
