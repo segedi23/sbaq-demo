@@ -66,7 +66,7 @@ function sessionsFrom(map, pid) {
 }
 
 /* =======================================================================
-   Player 1  (source: "onninkehitys 1307.pdf")
+   Player 1  (source: kehitysraportti 1, SBAQ/testidat)
    ======================================================================= */
 const p1 = {};
 {
@@ -99,7 +99,7 @@ const p1 = {};
 }
 
 /* =======================================================================
-   Player 2  (source: "Aapo_K_kehitys käyrät .pdf")
+   Player 2  (source: kehitysraportti 2, SBAQ/testidat)
    ======================================================================= */
 const p2 = {};
 {
@@ -191,7 +191,7 @@ const data = {
     todayIso: '2026-07-13',
     playerCount: players.length,
     pseudonymised: true,
-    source: 'Kehitysraportit kevät–kesä 2026. Nimet pseudonymisoitu, mittausarvot alkuperäisiä.',
+    source: 'Kehitysraportit keväältä ja kesältä 2026. Nimet pseudonymisoitu, mittausarvot alkuperäisiä.',
     hasAges: false,
     hasLeagues: false,
   },

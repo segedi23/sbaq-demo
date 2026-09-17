@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Kirjaudu · SBAQ Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --night: #0d0e10; --night-2: #17181b; --hair: #2c2f34; --text: #c9c8c3; --tape: #e2521d; --tape-2: #f06a35; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { background: var(--night); color: #fff; font: 400 16px/1.55 "Archivo", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--tape-2); outline-offset: 2px; }
+    .wrap { min-height: 100%; display: grid; grid-template-columns: 1.1fr 1fr; }
+
+    /* vasen: kuva ja tunnuslause */
+    .side { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 36px 44px 40px; isolation: isolate; }
+    .side-photos { position: absolute; inset: 0; z-index: -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+    .side-photos img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; filter: brightness(.8) contrast(1.05); }
+    .side-photos::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--night) 0%, rgba(13,14,16,.55) 45%, rgba(13,14,16,.35) 100%); }
+    .wordmark { font-weight: 900; font-stretch: 125%; font-size: 24px; letter-spacing: .03em; text-decoration: none; }
+    .side h2 { margin: 0; font-weight: 800; font-stretch: 92%; font-size: clamp(26px, 2.8vw, 38px); line-height: 1.1; letter-spacing: -.012em; max-width: 13em; }
+    .side p { margin: 14px 0 0; font: 500 12px/1.4 "IBM Plex Mono", ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--tape-2); }
+
+    /* oikea: lomake */
+    .panel { display: flex; flex-direction: column; justify-content: center; padding: 40px clamp(24px, 6vw, 88px); border-left: 1px solid var(--hair); }
+    .panel-in { width: 100%; max-width: 400px; margin: 0 auto; }
+    .kicker { font: 500 12px/1.4 "IBM Plex Mono", ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--tape-2); margin: 0 0 14px; }
+    h1 { margin: 0; font-weight: 800; font-stretch: 92%; font-size: 32px; line-height: 1.1; letter-spacing: -.012em; }
+    .intro { margin: 10px 0 30px; color: var(--text); font-size: 15.5px; }
+    label { display: block; font: 500 11.5px/1 "IBM Plex Mono", ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; color: #9a9ca1; margin: 0 0 8px; }
+    .field { margin-bottom: 18px; }
+    input[type="text"], input[type="password"] {
+      width: 100%; background: var(--night-2); color: #fff; border: 1px solid var(--hair); border-radius: 0;
+      font: 500 16px/1 "Archivo", sans-serif; padding: 15px 14px; outline: none;
+    }
+    input:focus { border-color: var(--tape-2); }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 4px 0 26px; font-size: 14px; color: var(--text); }
+    .row label { display: flex; align-items: center; gap: 9px; margin: 0; font: 400 14px/1 "Archivo", sans-serif; text-transform: none; letter-spacing: 0; color: var(--text); }
+    .row input { accent-color: var(--tape); width: 16px; height: 16px; }
+    .row span { color: #7d8086; }
+    button {
+      width: 100%; background: var(--tape); color: #fff; border: 0; border-radius: 0; cursor: pointer;
+      font: 700 16px/1 "Archivo", sans-serif; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center;
+    }
+    button:hover { background: var(--tape-2); }
+    button::after { content: "\2192"; transition: transform .18s ease; }
+    button:hover::after { transform: translateX(3px); }
+    .demo { margin: 26px 0 0; padding: 14px 0 0 14px; border-left: 2px solid var(--tape); font-size: 13.5px; line-height: 1.55; color: #9a9ca1; }
+    .back { display: inline-block; margin-top: 30px; font-size: 14px; color: var(--text); text-underline-offset: 4px; }
+    .back:hover { color: #fff; }
+
+    @media (max-width: 860px) {
+      .wrap { grid-template-columns: 1fr; grid-template-rows: 220px 1fr; }
+      .side { padding: 22px 24px 24px; }
+      .side h2 { font-size: 22px; }
+      .panel { border-left: 0; justify-content: flex-start; padding-top: 36px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <aside class="side">
+    <div class="side-photos" aria-hidden="true">
+      <img src="../img/avaus-tasapaino-kahvakuula.jpg" alt="">
+      <img src="../img/avaus-sivuttaisloikka.jpg" alt="">
+      <img src="../img/avaus-cross-under.jpg" alt="">
+    </div>
+    <a class="wordmark" href="../" aria-label="SBAQ, etusivulle">SBAQ</a>
+    <div>
+      <h2>Kehitystä mitataan ja ohjataan datalla, ei tuntumalla.</h2>
+      <p>Mitataan · Kehitetään · Siirretään jäälle</p>
+    </div>
+  </aside>
+
+  <main class="panel">
+    <div class="panel-in">
+      <p class="kicker">SBAQ Academy · testialusta</p>
+      <h1>Kirjaudu sisään</h1>
+      <p class="intro">Valmentajat näkevät koko ryhmän tulokset. Pelaaja näkee omansa.</p>
+
+      <form id="login" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="user">Käyttäjä</label>
+          <input id="user" name="user" type="text" value="Timo Salo" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="field">
+          <label for="pass">Salasana</label>
+          <input id="pass" name="pass" type="password" value="esittelyversio" autocomplete="off" />
+        </div>
+        <div class="row">
+          <label><input type="checkbox" checked /> Muista minut</label>
+          <span>Ylläpitäjä</span>
+        </div>
+        <button type="submit">Kirjaudu</button>
+      </form>
+
+      <p class="demo">
+        Esittelyversio. Tunnukset on täytetty valmiiksi, eikä salasanaa tarkisteta.
+        Oikea kirjautuminen ja käyttäjäroolit tulevat tallennuksen yhteydessä.
+      </p>
+      <a class="back" href="../">Takaisin etusivulle</a>
+    </div>
+  </main>
+
+</div>
+<script>
+  /* Esittelykirjautuminen: ei lähetä mitään minnekään, merkitsee vain istunnon avatuksi. */
+  document.getElementById("login").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = document.getElementById("user").value.trim() || "Timo Salo";
+    var ok = false;
+    try { sessionStorage.setItem("sbaq_demo_user", name); ok = true; } catch (err) {}
+    location.href = "index.html?v=3" + (ok ? "" : "&kirjautunut=1") + location.hash;
+  });
+</script>
+</body>
+</html>

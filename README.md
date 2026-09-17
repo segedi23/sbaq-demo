@@ -18,8 +18,10 @@ python3 -m http.server 8199
 
 | Tiedosto | Rooli |
 |---|---|
-| `index.html`, `site.css` | Julkinen esittelysivu (etusivu) |
-| `app/index.html`, `app/styles.css`, `app/main.js` | Dashboard (lista, pelaajanäkymä, vertailu, raportti) |
+| `index.html`, `site.css`, `site.js` | Julkinen esittelysivu (etusivu). `site.js` pyörittää kuvasarjat |
+| `img/` | Harjoituskuvat mustavalkoisina ja rajattuina niin, ettei kasvoja näy (landmine-sarjassa pää on häivytetty). Nimetty harjoitteen mukaan, ei pelaajien nimiä. `tyokalu-kehityskaari.webp` on kuvakaappaus osoitteesta `app/#p1` |
+| `app/kirjaudu.html` | Esittelykirjautuminen: tunnukset valmiiksi täytettynä (Timo Salo), salasanaa ei tarkisteta, mitään ei lähetetä. Merkitsee istunnon avatuksi (`sessionStorage`), `app/index.html` ohjaa tänne ilman sitä |
+| `app/index.html`, `app/styles.css`, `app/main.js` | Dashboard (lista, pelaajanäkymä, vertailu, raportti). Suorat linkit: `app/#p1`, `app/#vertailu` |
 | `app/data.js` | **Käytössä oleva aineisto** (`window.SBAQ_DATA`). Generoitu tiedostosta `build-real-data.mjs` |
 | `app/build-real-data.mjs` | Oikeat mittaustulokset -> `app/data.js`. Aja `node app/build-real-data.mjs` |
 | `app/generate.mjs` | Synteettisen demodatan generaattori -> `app/data-demo.js` (ei käytössä oletuksena) |

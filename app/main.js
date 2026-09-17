@@ -1362,4 +1362,10 @@ $('#dataNote').textContent = D.meta.dataset === 'real'
   ? `Oikeat mittaustulokset (${D.meta.playerCount} pelaajaa, ${D.players.reduce((a, p) => a + p.sessions.length, 0)} testikertaa) · nimet pseudonymisoitu · numerot lasketaan datasta`
   : `Demo · synteettinen data (${D.meta.playerCount} pelaajaa) · numerot lasketaan datasta, eivät ole oikeita henkilöitä`;
 initRole();
+/* Suora linkki: app/#p1 avaa pelaajan, app/#vertailu vertailun. */
+(function () {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h === 'vertailu') state.view = 'compare';
+  else if (h && D.players.some((pl) => pl.id === h)) { state.view = 'player'; state.playerId = h; }
+})();
 render();

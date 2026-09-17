@@ -4,7 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SBAQ Testialusta</title>
-  <link rel="stylesheet" href="styles.css" />
+  <script>
+    /* Esittelykirjautuminen: ilman avattua istuntoa ohjataan kirjautumissivulle. */
+    (function () {
+      var user = null;
+      try { user = sessionStorage.getItem("sbaq_demo_user"); } catch (e) {}
+      if (!user && !/[?&]kirjautunut=1/.test(location.search)) location.replace("kirjaudu.html" + location.hash);
+      window.SBAQ_USER = user || "Timo Salo";
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260917b" />
 </head>
 <body>
   <header class="topbar">
@@ -16,6 +28,10 @@
       <button data-view="roster" class="active">Pelaajat</button>
       <button data-view="compare">Vertailu</button>
     </nav>
+    <div class="userbox">
+      <span class="uname" id="userName"></span>
+      <a href="kirjaudu.html" id="logout">Kirjaudu ulos</a>
+    </div>
     <div class="rolebox">
       <label>Rooli</label>
       <select id="roleSelect" title="Demo: vaihda roolia (ylläpitäjä näkee kaiken, pelaaja vain omansa)"></select>
@@ -28,7 +44,13 @@
     <span id="dataNote"></span>
   </footer>
 
+  <script>
+    document.getElementById("userName").textContent = window.SBAQ_USER;
+    document.getElementById("logout").addEventListener("click", function () {
+      try { sessionStorage.removeItem("sbaq_demo_user"); } catch (e) {}
+    });
+  </script>
   <script src="data.js"></script>
-  <script src="main.js"></script>
+  <script src="main.js?v=20260917"></script>
 </body>
 </html>
