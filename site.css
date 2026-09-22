@@ -300,6 +300,15 @@ table { border-collapse: collapse; width: 100%; }
 .case-chart svg { display: block; width: 100%; height: auto; }
 .case-chart figcaption { margin-top: 14px; font-size: 13.5px; line-height: 1.55; color: var(--gray); }
 .case-chart figcaption span { font: 500 11.5px/1 var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--tape); margin-right: 10px; }
+.case-data { margin-top: 16px; border-top: 1px solid var(--hair); padding-top: 10px; }
+.case-data summary { cursor: pointer; font: 500 12px/1.6 var(--f-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--tape); }
+.case-data table { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: 14px; }
+.case-data th, .case-data td { text-align: left; padding: 6px 12px 6px 0; border-bottom: 1px solid var(--hair); vertical-align: top; }
+.case-data thead th { font: 500 11px/1.4 var(--f-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--gray); }
+.case-data tbody th { font-weight: 500; }
+.case-data td:nth-child(2), .case-data td:nth-child(3) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.case-data p { margin-top: 12px; font-size: 13.5px; line-height: 1.55; color: var(--gray); }
+.case-read div p b { font-weight: 700; }
 .case-stats { border-top: 1px solid var(--ink); }
 .case-stats li { padding: 16px 0 18px; border-bottom: 1px solid var(--hair); }
 .case-stats i { display: block; font: 500 11.5px/1.4 var(--f-mono); font-style: normal; text-transform: uppercase; letter-spacing: .07em; color: var(--gray); }

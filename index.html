@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="site.css?v=20260922c" />
+  <link rel="stylesheet" href="site.css?v=20260922e" />
 </head>
 <body id="top">
 
@@ -38,7 +38,7 @@
       <a href="#tilanne">Tilanne</a>
       <a href="#yhteys">Yhteys</a>
     </nav>
-    <a class="mast-tool" href="app/kirjaudu.html">Katso demo</a>
+    <a class="mast-tool" href="app/index.html?kirjautunut=1">Katso demo</a>
     <button class="mast-menu" type="button" aria-expanded="false" aria-controls="mast-nav">Valikko</button>
   </div>
 </header>
@@ -68,7 +68,7 @@
           säännöllinen testaus ja työkalu, josta näkee, mitä harjoittelu tuottaa.
         </p>
         <p class="hero-links">
-          <a class="go" href="app/kirjaudu.html">Katso demo</a>
+          <a class="go" href="app/index.html?kirjautunut=1">Katso demo</a>
           <a class="under" href="#ominaisuudet">Tutustu SBAQ:hon</a>
         </p>
         <p class="hero-note">Mitataan · Kehitetään · Siirretään jäälle</p>
@@ -406,103 +406,147 @@
   <!-- ================= 05 case ================= -->
   <section class="sec" id="case">
     <header class="sec-mark">
-      <span class="no">05 · Case</span>
+      <span class="no">05 · Case: yhden pelaajan seurantasarja</span>
       <h2>Mitä tapahtuu, kun harjoittelu muuttuu?</h2>
     </header>
 
     <p class="sec-intro">
-      U20-tason pelaaja harjoitteli SBAQ-valmennuksessa keväällä 2026 noin kolme kuukautta,
-      ja testitulokset kehittyivät selvästi. Kesän hän harjoitteli seuransa omalla ohjelmalla
-      ilman SBAQ:ta. Syyskuun alun testeissä useat keväällä nousseet mittarit olivat laskeneet
-      kevään tasosta, kun samaan aikaan SBAQ-ryhmän muut pelaajat olivat menneet eteenpäin.
-      Pelaaja palasi SBAQ-harjoitteluun seuraharjoittelun rinnalle, ja 16 päivää myöhemmin
-      testattiin uudelleen.
+      U20-tason pelaaja harjoitteli keväällä 2026 SBAQ:ssa noin kolme kuukautta pelikauden
+      rinnalla. Kevään viimeinen testi 23.4. oli sarjan siihen asti paras, muuten kevään
+      taso pysyi lähtötason tuntumassa. Kesän hän harjoitteli seuransa omalla ohjelmalla
+      ilman SBAQ:ta, ja syyskuun alussa tulos oli kevään keskitasolla. Pelaaja palasi
+      SBAQ-harjoitteluun seuraharjoittelun rinnalle, ja 16 päivää myöhemmin testattiin
+      uudelleen. Tässä on koko sarja sellaisenaan.
     </p>
 
     <ol class="story four case-time">
       <li><b>Helmi-huhtikuu 2026</b><span>Pelikausi ja SBAQ-harjoittelu rinnakkain. Kuusi testikertaa, kevennyshypyn keskiarvo 48,7 cm ja paras 51,6 cm.</span></li>
-      <li><b>Touko-elokuu 2026</b><span>Seuran oma kesäohjelma, ei SBAQ-harjoittelua. Maksimivoima kehittyi, nopeaa voimantuottoa ei harjoitettu erikseen.</span></li>
+      <li><b>Touko-elokuu 2026</b><span>Seuran oma kesäohjelma, ei SBAQ-harjoittelua. Ei hyppytestejä. Maksimivoimasta ei ole mittaussarjaa, joten sen kehitystä ei tässä väitetä.</span></li>
       <li><b>5.9.2026</b><span>Kesän jälkeinen lähtötaso: kevennyshyppy 48,8 cm, staattinen hyppy 44,4 cm. SBAQ käynnistyy uudelleen seuraharjoittelun rinnalla.</span></li>
-      <li><b>21.9.2026</b><span>Kaksoistesti 16 päivän SBAQ-jakson jälkeen: kevennyshyppy 52,4 cm, koko sarjan paras. Sama testi toistettiin 45 minuutin kovan treenin jälkeen.</span></li>
+      <li><b>21.9.2026</b><span>Kaksoistesti 16 päivän SBAQ-jakson jälkeen: kevennyshyppy 52,4 cm, sarjan korkein. Sama testi toistettiin 45 minuutin harjoituksen jälkeen.</span></li>
     </ol>
 
     <div class="case">
       <figure class="case-chart">
-        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="case-chart-title" font-family="Archivo, Helvetica, Arial, sans-serif">
-        <title id="case-chart-title">Kevennyshypyn kehitys kesästä 2025 syyskuuhun 2026. Kevään SBAQ-jaksolla nousu 51,6 senttiin, kesän jälkeen 48,8 ja 16 päivän SBAQ-jakson jälkeen 52,4 senttiä.</title>
-        <rect x="115.5" y="26" width="454.3" height="230" fill="rgba(226,82,29,.07)"/>
-        <text x="342.6" y="246" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#e2521d">SBAQ KEVÄT</text>
-        <rect x="569.7" y="26" width="90.8" height="230" fill="rgba(19,20,22,.045)"/>
-        <text x="615.1" y="246" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#8b8d92">KESÄ</text>
-        <rect x="660.5" y="26" width="69.5" height="230" fill="rgba(226,82,29,.07)"/>
-        <text x="695.3" y="246" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#e2521d">SBAQ</text>
-        <line x1="46" y1="256.0" x2="730" y2="256.0" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="260.0" text-anchor="end" font-size="12" fill="#73767b">46</text>
-        <line x1="46" y1="223.1" x2="730" y2="223.1" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="227.1" text-anchor="end" font-size="12" fill="#73767b">47</text>
-        <line x1="46" y1="190.3" x2="730" y2="190.3" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="194.3" text-anchor="end" font-size="12" fill="#73767b">48</text>
-        <line x1="46" y1="157.4" x2="730" y2="157.4" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="161.4" text-anchor="end" font-size="12" fill="#73767b">49</text>
-        <line x1="46" y1="124.6" x2="730" y2="124.6" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="128.6" text-anchor="end" font-size="12" fill="#73767b">50</text>
-        <line x1="46" y1="91.7" x2="730" y2="91.7" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="95.7" text-anchor="end" font-size="12" fill="#73767b">51</text>
-        <line x1="46" y1="58.9" x2="730" y2="58.9" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="62.9" text-anchor="end" font-size="12" fill="#73767b">52</text>
-        <line x1="46" y1="26.0" x2="730" y2="26.0" stroke="#d6d3ca" stroke-width="1"/>
-        <text x="38" y="30.0" text-anchor="end" font-size="12" fill="#73767b">53</text>
-        <text x="38" y="18" text-anchor="end" font-size="11" fill="#73767b">cm</text>
-        <polyline points="70.0,187.0 160.9,187.0 251.7,170.6 342.6,187.0 433.4,213.3 524.3,72.0 615.1,164.0 706.0,45.7" fill="none" stroke="#131416" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <circle cx="70.0" cy="187.0" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
-        <text x="70.0" y="175.0" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,1</text>
-        <text x="70.0" y="278" text-anchor="middle" font-size="12" fill="#44474c">kesä 2025</text>
-        <circle cx="160.9" cy="187.0" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
-        <text x="160.9" y="175.0" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,1</text>
-        <text x="160.9" y="278" text-anchor="middle" font-size="12" fill="#44474c">6.2.</text>
-        <circle cx="251.7" cy="170.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
-        <text x="251.7" y="158.6" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,6</text>
-        <text x="251.7" y="278" text-anchor="middle" font-size="12" fill="#44474c">7.3.</text>
-        <circle cx="342.6" cy="187.0" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
-        <text x="342.6" y="175.0" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,1</text>
-        <text x="342.6" y="278" text-anchor="middle" font-size="12" fill="#44474c">11.3.</text>
-        <circle cx="433.4" cy="213.3" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
-        <text x="433.4" y="233.3" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">47,3</text>
-        <text x="433.4" y="278" text-anchor="middle" font-size="12" fill="#44474c">8.4.</text>
-        <circle cx="524.3" cy="72.0" r="6" fill="#e2521d" stroke="#fff" stroke-width="2"/>
-        <text x="524.3" y="60.0" text-anchor="middle" font-size="12.5" font-weight="700" fill="#e2521d">51,6</text>
-        <text x="524.3" y="278" text-anchor="middle" font-size="12" fill="#44474c">23.4.</text>
-        <circle cx="615.1" cy="164.0" r="6" fill="#73767b" stroke="#fff" stroke-width="2"/>
-        <text x="615.1" y="184.0" text-anchor="middle" font-size="12.5" font-weight="700" fill="#131416">48,8</text>
-        <text x="615.1" y="278" text-anchor="middle" font-size="12" fill="#44474c">5.9.</text>
-        <circle cx="706.0" cy="45.7" r="6" fill="#e2521d" stroke="#fff" stroke-width="2"/>
-        <text x="706.0" y="33.7" text-anchor="middle" font-size="12.5" font-weight="700" fill="#e2521d">52,4</text>
-        <text x="706.0" y="278" text-anchor="middle" font-size="12" fill="#44474c">21.9.</text>
+        <svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="case-chart-title" font-family="Archivo, Helvetica, Arial, sans-serif">
+        <title id="case-chart-title">Kevennyshyppy testipäivittäin kesästä 2025 syyskuuhun 2026 aikajanalla. Kevään keskiarvo 48,7 cm ja sen ympärillä noin kolmen prosentin vaihteluväli. Huhtikuun puolivälin tulos 45,6 on merkitty avoimella pisteellä, koska saman päivän staattinen hyppy ylitti kevennyshypyn ja päivä on jätetty tulkinnasta pois. Syyskuun 21. päivän tulos 52,4 on sarjan korkein.</title>
+        <rect x="158.3" y="22" width="204.5" height="240" fill="rgba(19,20,22,.05)"/>
+        <text x="260.6" y="34" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#73767b">SBAQ + PELIKAUSI</text>
+        <rect x="365.1" y="22" width="292.9" height="240" fill="rgba(19,20,22,.02)"/>
+        <text x="511.6" y="34" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#73767b">SEURAN KESÄOHJELMA</text>
+        <rect x="660.3" y="22" width="58.1" height="240" fill="rgba(19,20,22,.05)"/>
+        <text x="689.3" y="34" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#73767b">SBAQ</text>
+        <rect x="46" y="114.1" width="684" height="70.2" fill="rgba(226,82,29,.10)"/>
+        <line x1="46" y1="149.2" x2="730" y2="149.2" stroke="#e2521d" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="146" y="109.1" text-anchor="start" font-size="11" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".06em" fill="#e2521d">KEVÄÄN KA 48,7 ± 3 %</text>
+        <line x1="46" y1="262.0" x2="730" y2="262.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="266.0" text-anchor="end" font-size="12" fill="#73767b">44</text>
+        <line x1="46" y1="214.0" x2="730" y2="214.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="218.0" text-anchor="end" font-size="12" fill="#73767b">46</text>
+        <line x1="46" y1="166.0" x2="730" y2="166.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="170.0" text-anchor="end" font-size="12" fill="#73767b">48</text>
+        <line x1="46" y1="118.0" x2="730" y2="118.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="122.0" text-anchor="end" font-size="12" fill="#73767b">50</text>
+        <line x1="46" y1="70.0" x2="730" y2="70.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="74.0" text-anchor="end" font-size="12" fill="#73767b">52</text>
+        <line x1="46" y1="22.0" x2="730" y2="22.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="26.0" text-anchor="end" font-size="12" fill="#73767b">54</text>
+        <text x="38" y="16" text-anchor="end" font-size="11" fill="#73767b">cm</text>
+        <line x1="158.3" y1="262" x2="158.3" y2="267" stroke="#73767b"/>
+        <text x="190.8" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">helmi</text>
+        <line x1="223.3" y1="262" x2="223.3" y2="267" stroke="#73767b"/>
+        <text x="255.9" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">maalis</text>
+        <line x1="295.4" y1="262" x2="295.4" y2="267" stroke="#73767b"/>
+        <text x="327.9" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">huhti</text>
+        <line x1="365.1" y1="262" x2="365.1" y2="267" stroke="#73767b"/>
+        <text x="397.7" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">touko</text>
+        <line x1="437.2" y1="262" x2="437.2" y2="267" stroke="#73767b"/>
+        <text x="469.7" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">kesä</text>
+        <line x1="506.9" y1="262" x2="506.9" y2="267" stroke="#73767b"/>
+        <text x="539.4" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">heinä</text>
+        <line x1="578.9" y1="262" x2="578.9" y2="267" stroke="#73767b"/>
+        <text x="611.5" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">elo</text>
+        <line x1="651.0" y1="262" x2="651.0" y2="267" stroke="#73767b"/>
+        <text x="683.5" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">syys</text>
+        <line x1="142" y1="262" x2="730" y2="262" stroke="#44474c"/>
+        <line x1="46" y1="262" x2="112" y2="262" stroke="#44474c"/>
+        <polyline points="112,262 118,256 124,268 130,262" fill="none" stroke="#44474c"/>
+        <line x1="130" y1="262" x2="142" y2="262" stroke="#44474c"/>
+        <text x="86" y="282" text-anchor="middle" font-size="11.5" fill="#44474c">kesä 2025</text>
+        <text x="86" y="296" text-anchor="middle" font-size="10.5" fill="#8b8d92">(vertailutaso)</text>
+        <polyline points="169.9,163.6 237.3,151.6 246.6,163.6 311.7,182.8 346.5,79.6 660.3,146.8 697.5,60.4" fill="none" stroke="#131416" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <line x1="86" y1="163.6" x2="169.9" y2="163.6" stroke="#131416" stroke-width="1.5" stroke-dasharray="3 5"/>
+        <circle cx="86" cy="163.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="86" y="152.6" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">48,1</text>
+        <circle cx="169.9" cy="163.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="169.9" y="184.6" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">48,1</text>
+        <circle cx="237.3" cy="151.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="237.3" y="140.6" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">48,6</text>
+        <circle cx="246.6" cy="163.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="246.6" y="184.6" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">48,1</text>
+        <circle cx="311.7" cy="182.8" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="311.7" y="203.8" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">47,3</text>
+        <circle cx="327.9" cy="223.6" r="5" fill="#fff" stroke="#73767b" stroke-width="2"/>
+        <text x="327.9" y="244.6" text-anchor="middle" font-size="11.5" fill="#73767b">45,6*</text>
+        <circle cx="346.5" cy="79.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="346.5" y="68.6" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">51,6</text>
+        <circle cx="660.3" cy="146.8" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="660.3" y="167.8" text-anchor="middle" font-size="12" font-weight="500" fill="#131416">48,8</text>
+        <circle cx="697.5" cy="60.4" r="6" fill="#e2521d" stroke="#fff" stroke-width="2"/>
+        <text x="697.5" y="49.4" text-anchor="middle" font-size="12" font-weight="700" fill="#e2521d">52,4</text>
         </svg>
-        <figcaption><span>Kevennyshyppy, kahdella jalalla</span> Mattotesti, kahdeksan testipäivää kesästä 2025 syyskuuhun 2026. Huhtikuun puolivälin testi on jätetty pois mittausvirheen vuoksi, ja 21.9. näytetään treeniä edeltävä tulos. Asteikko alkaa 46 cm:stä. Molemmat huiput osuvat SBAQ-jaksoihin.</figcaption>
+        <figcaption><span>Kevennyshyppy, kahdella jalalla</span> Mattotesti. Aika-akseli on mittakaavassa, kesän 2025 vertailutaso on katkaistun akselin vasemmalla puolella. Oranssi vyöhyke on kevään keskiarvo ja sen ympärillä noin kolmen prosentin vaihteluväli, jonka sisällä olevia eroja ei kannata tulkita. *15.4. on jätetty tulkinnasta pois, koska saman päivän staattinen hyppy ylitti kevennyshypyn, mikä viittaa suoritusvirheeseen. Tulos näytetään silti.</figcaption>
+        <details class="case-data">
+          <summary>Kaikki mittaukset taulukkona</summary>
+          <table>
+            <thead><tr><th scope="col">Testipäivä</th><th scope="col">CMJ, cm</th><th scope="col">SJ, cm</th><th scope="col">Jakso</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">kesä 2025</th><td>48,1</td><td>44,0</td><td>vertailutaso</td></tr>
+              <tr><th scope="row">6.2.2026</th><td>48,1</td><td>45,4</td><td>SBAQ + pelikausi</td></tr>
+              <tr><th scope="row">7.3.2026</th><td>48,6</td><td>45,6</td><td>SBAQ + pelikausi</td></tr>
+              <tr><th scope="row">11.3.2026</th><td>48,1</td><td>46,1</td><td>SBAQ + pelikausi</td></tr>
+              <tr><th scope="row">8.4.2026</th><td>47,3</td><td>43,4</td><td>SBAQ + pelikausi</td></tr>
+              <tr><th scope="row">15.4.2026</th><td>45,6*</td><td>50,8*</td><td>SBAQ + pelikausi</td></tr>
+              <tr><th scope="row">23.4.2026</th><td>51,6</td><td>47,2</td><td>SBAQ + pelikausi</td></tr>
+              <tr><th scope="row">5.9.2026</th><td>48,8</td><td>44,4</td><td>kesän jälkeen</td></tr>
+              <tr><th scope="row">21.9.2026, ennen harjoitusta</th><td>52,4</td><td>47,2</td><td>16 pv SBAQ:ta</td></tr>
+              <tr><th scope="row">21.9.2026, 45 min harjoituksen jälkeen</th><td>52,2</td><td>49,8</td><td>akuutti vaste</td></tr>
+            </tbody>
+          </table>
+          <p>Yhden jalan hypyt (SJ ja CMJ, oikea ja vasen) on mitattu samoina päivinä; niiden keskiarvo oli 23.4. 26,5 cm, 5.9. 24,9 cm ja 21.9. 25,8 cm. Testaaja ja laite ovat olleet samat koko sarjan ajan.</p>
+        </details>
       </figure>
 
       <ul class="case-stats">
-        <li><i>Kevään keskiarvo → kesän jälkeen</i><b class="down">+0,2 %</b><span>48,7 → 48,8 cm. Neljä kuukautta seuran ohjelmalla, hyppytulos ei liikkunut. Kevään paras 51,6 cm jäi taakse.</span></li>
-        <li><i>16 päivää SBAQ:ta</i><b>+7,3 %</b><span>48,8 → 52,4 cm, koko sarjan paras. Staattinen hyppy nousi samalla 6,3 %.</span></li>
-        <li><i>45 min kovan treenin jälkeen</i><b>+5,6 %</b><span>Staattinen hyppy 47,2 → 49,8 cm samana päivänä. Yksikään tulos ei laskenut, eli kuormitus oli oikein annosteltu.</span></li>
+        <li><i>Kevään keskiarvo → kesän jälkeen (5.9.)</i><b class="down">+0,2 %</b><span>48,7 → 48,8 cm. Neljä kuukautta seuran ohjelmalla, hyppytulos ei liikkunut kumpaankaan suuntaan.</span></li>
+        <li><i>5.9. → 21.9., kaksi yksittäistä mittausta</i><b>+7,3 %</b><span>48,8 → 52,4 cm. Ylittää vaihteluvälin selvästi, mutta on kahden testipäivän ero, ei jakson keskiarvo.</span></li>
+        <li><i>Kevään paras → 21.9.</i><b class="down">+1,6 %</b><span>51,6 → 52,4 cm. Parhaiden tulosten ero on vaihteluvälin sisällä. Sarjan taso siis palasi kevään huipun tasolle, ei sen ohi.</span></li>
       </ul>
     </div>
 
     <div class="case-read">
-      <p class="q-label">Mitä tämä kertoo</p>
+      <p class="q-label">Mitä tästä voi päätellä ja mitä ei</p>
       <div>
         <p>
-          Kuusitoista päivää on liian lyhyt aika lihaskasvulle. Muutos on hermostollinen ja
-          elastinen: järjestelmä oppi käyttämään voimaa, jonka kesän voimaharjoittelu oli jo
-          rakentanut. Kesä rakensi, SBAQ realisoi. Voima ja sen nopea ilmaisu ovat eri
-          ominaisuuksia, ja paras tulos syntyy, kun molempia harjoitetaan rinnakkain.
+          <b>Voi päätellä:</b> pelaajan kevennyshyppy oli 21.9. hänen sarjansa korkein, ja ero
+          syyskuun alkuun on suurempi kuin mittauksen tavallinen vaihtelu. Kesän aikana
+          hyppytulos ei kehittynyt. Muutos 16 päivässä on liian nopea selittyäkseen
+          lihaskasvulla.
         </p>
         <p>
-          Toinen havainto koskee kuormitusta. Hyppytuloksen nousu heti harjoituksen jälkeen
-          on tunnettu aktivaatioilmiö, jonka hyvä lämmittelykin tuottaa. Olennaista on, ettei
-          45 minuutin kova harjoitus painanut yhtäkään tulosta alaspäin: toistot ovat lyhyitä
-          ja palautukset täydet, joten annostelu sopii pelikauteen eikä kuluta jalkoja peleihin.
+          <b>Ei voi päätellä:</b> että nousu johtuisi SBAQ:sta. Samaan aikaan kauden alku
+          laski seuran harjoitusvolyymia ja pelit alkoivat, mikä yksinään voi nostaa
+          hyppytulosta. Verrokkia ei ole, eikä sarjassa ole yhtään jäätestiä, joten
+          vaikutusta luisteluun ei ole mitattu. Valmentajien tulkinta on, että kesän
+          voimaharjoittelu rakensi pohjan ja SBAQ-jakso muutti sen nopeaksi voimantuotoksi.
+          Se on hypoteesi, jota seuraavat testit joko tukevat tai eivät.
+        </p>
+        <p>
+          <b>Harjoituksen jälkeinen testi:</b> staattinen hyppy nousi 45 minuutin harjoituksen
+          jälkeen 5,6 % ja kevennyshyppy pysyi ennallaan. Tämä on tunnettu akuutti
+          aktivaatiovaikutus, jonka hyvä lämmittelykin tuottaa. Se ei kerro harjoitusjakson
+          vaikutuksesta eikä todista annostelun oikeellisuutta. Se kertoo vain, ettei yksi
+          harjoitus painanut tuloksia alle lähtötason samana päivänä.
         </p>
       </div>
     </div>
@@ -515,12 +559,10 @@
     </ol>
 
     <p class="footnote">
-      Yksi pelaaja ei ole tutkimus, ja kauden alku muutti samalla seuran kuormitusta:
-      harjoitusvolyymi laski ja pelit alkoivat. Osa noususta voi selittyä tällä, eikä SBAQ:n
-      osuutta voi erottaa täysin ilman verrokkia. Muutos on kuitenkin selvästi mattotestin
-      tyypillistä vaihtelua (2-4 %) suurempi ja toistui kahdessa testissä samana päivänä.
-      Pelaajan nimi ja seura on jätetty pois. Testit: mattotesti, kevennyshyppy (CMJ) ja
-      staattinen hyppy (SJ) kahdella ja yhdellä jalalla.
+      Yksi pelaaja ei ole tutkimus. Tämä sarja on täällä esimerkkinä siitä, miltä
+      pelaajakohtainen seuranta näyttää ja miten sitä luetaan, ei näyttönä menetelmän
+      vaikutuksesta. Ryhmätason tulokset julkaistaan, kun useamman pelaajan sarjat ovat
+      koossa saman protokollan mukaan. Pelaajan nimi ja seura on jätetty pois.
     </p>
   </section>
 
@@ -646,11 +688,11 @@
   <div class="end-base">
     <span class="wordmark small">SBAQ</span>
     <span>SBAQ Academy Oy · Speed · Balance · Agility · Quickness</span>
-    <a href="app/kirjaudu.html">Katso demo</a>
+    <a href="app/index.html?kirjautunut=1">Katso demo</a>
     <a href="#top">Sivun alkuun</a>
   </div>
 </footer>
 
-<script src="site.js?v=20260922c"></script>
+<script src="site.js?v=20260922e"></script>
 </body>
 </html>
