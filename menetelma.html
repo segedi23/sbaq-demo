@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SBAQ Academy. Menetelmä ja testit</title>
+  <meta name="description" content="SBAQ:n neljä ominaisuutta, välineet, testipatteristo ja menetelmän perusteet. Mitä SBAQ lisää seuran nykyiseen fysiikkavalmennukseen ja missä vaiheessa seurantatyökalu on." />
+  <link rel="canonical" href="https://segedi23.github.io/sbaq-demo/menetelma.html" />
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fi_FI" />
+  <meta property="og:site_name" content="SBAQ Academy" />
+  <meta property="og:title" content="SBAQ Academy. Menetelmä ja testit" />
+  <meta property="og:description" content="Harjoittelu mitataan ja tulosten pitää näkyä jäällä. Katso demo ja yhden pelaajan case: mitä tapahtuu, kun harjoittelu muuttuu." />
+  <meta property="og:url" content="https://segedi23.github.io/sbaq-demo/menetelma.html" />
+  <meta property="og:image" content="https://segedi23.github.io/sbaq-demo/img/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="site.css?v=20260922f" />
+</head>
+<body id="top">
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="wordmark" href="index.html" aria-label="SBAQ, etusivulle">SBAQ</a>
+    <nav class="mast-nav" id="mast-nav" aria-label="Sivun osat">
+      <a href="index.html">Etusivu</a>
+      <a href="#ominaisuudet">SBAQ</a>
+      <a href="#testit">Testit</a>
+      <a href="#menetelma">Menetelmä</a>
+      <a href="#tilanne">Tilanne</a>
+      <a href="index.html#yhteys">Yhteys</a>
+    </nav>
+    <a class="mast-tool" href="app/index.html?kirjautunut=1">Katso demo</a>
+    <button class="mast-menu" type="button" aria-expanded="false" aria-controls="mast-nav">Valikko</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="sub-head">
+    <p class="dateline">SBAQ Academy · menetelmä ja testit</p>
+    <h1>Mitä SBAQ on ja miten se mitataan</h1>
+    <p class="lead">Tällä sivulla on menetelmän perusteet, välineet, testipatteristo ja seurantatyökalun tilanne. Palvelun sisältö ja yhden pelaajan seurantasarja ovat <a href="index.html">etusivulla</a>.</p>
+  </section>
+
+  <!-- ================= 01 neljä ominaisuutta ================= -->
+  <section class="sec" id="ominaisuudet">
+    <header class="sec-mark">
+      <span class="no">01 · SBAQ</span>
+      <h2>Neljä ominaisuutta, yksi harjoittelu</h2>
+    </header>
+
+    <div class="question">
+      <div>
+        <p class="q-label">Perinteinen kysymys</p>
+        <p class="q-old">Kuinka paljon pelaaja tuottaa voimaa?</p>
+      </div>
+      <div>
+        <p class="q-label">SBAQ:n kysymys</p>
+        <p class="q-new">Pystyykö pelaaja jarruttamaan, hallitsemaan kehoaan ja tuottamaan uuden liikkeen sekunnin murto-osassa?</p>
+      </div>
+    </div>
+
+    <p class="sec-intro">
+      SBAQ ei ole yksittäinen harjoite eikä uusi fysiikan teoria. Se on tapa yhdistää
+      nopeus, tasapaino, ketteryys, reagointi ja voimantuotto samaan harjoitteluun niin,
+      että niiden pitäisi lopulta näkyä parempana liikkumisena jäällä.
+    </p>
+
+    <div class="quals">
+
+      <article class="qual">
+        <figure class="reel" data-reel>
+          <div class="reel-stage">
+            <img src="img/vesisakkijuoksu-1.jpg" alt="Vesisäkkijuoksu, ruutu 1" loading="lazy">
+            <img src="img/vesisakkijuoksu-2.jpg" alt="Vesisäkkijuoksu, ruutu 2" loading="lazy">
+            <img src="img/vesisakkijuoksu-3.jpg" alt="Vesisäkkijuoksu, ruutu 3" loading="lazy">
+            <img src="img/vesisakkijuoksu-4.jpg" alt="Vesisäkkijuoksu, ruutu 4" loading="lazy">
+          </div>
+          <figcaption><span class="reel-name">Vesisäkkijuoksu</span><span class="reel-count"></span></figcaption>
+        </figure>
+        <div class="qual-body">
+          <h3>Speed <span>Nopeus</span></h3>
+          <p>Elastinen, rytminen nopeus, ei painava voimantuotto.</p>
+        </div>
+      </article>
+
+      <article class="qual">
+        <figure class="reel" data-reel>
+          <div class="reel-stage">
+            <img src="img/tasapaino-kahvakuula-1.jpg" alt="Yhden jalan seisonta BOSUlla, kahvakuula kädessä, ruutu 1" loading="lazy">
+            <img src="img/tasapaino-kahvakuula-2.jpg" alt="Yhden jalan seisonta BOSUlla, kahvakuula kädessä, ruutu 2" loading="lazy">
+            <img src="img/tasapaino-kahvakuula-3.jpg" alt="Yhden jalan seisonta BOSUlla, kahvakuula kädessä, ruutu 3" loading="lazy">
+            <img src="img/tasapaino-kahvakuula-4.jpg" alt="Yhden jalan seisonta BOSUlla, kahvakuula kädessä, ruutu 4" loading="lazy">
+          </div>
+          <figcaption><span class="reel-name">Yhdellä jalalla BOSUlla</span><span class="reel-count"></span></figcaption>
+        </figure>
+        <div class="qual-body">
+          <h3>Balance <span>Tasapaino</span></h3>
+          <p>Yhden jalan dynaaminen hallinta ja keskivartalon stabiliteetti.</p>
+        </div>
+      </article>
+
+      <article class="qual">
+        <figure class="reel" data-reel>
+          <div class="reel-stage">
+            <img src="img/cross-under-1.jpg" alt="Yhden jalan cross under, ruutu 1" loading="lazy">
+            <img src="img/cross-under-2.jpg" alt="Yhden jalan cross under, ruutu 2" loading="lazy">
+            <img src="img/cross-under-3.jpg" alt="Yhden jalan cross under, ruutu 3" loading="lazy">
+            <img src="img/cross-under-4.jpg" alt="Yhden jalan cross under, ruutu 4" loading="lazy">
+          </div>
+          <figcaption><span class="reel-name">Yhden jalan cross under</span><span class="reel-count"></span></figcaption>
+        </figure>
+        <div class="qual-body">
+          <h3>Agility <span>Ketteryys</span></h3>
+          <p>Suunnanvaihdot tasapainon säilyttäen.</p>
+        </div>
+      </article>
+
+      <article class="qual">
+        <figure class="reel" data-reel>
+          <div class="reel-stage">
+            <img src="img/sivuttaisloikka-1.jpg" alt="Sivuttaisloikka vesisäkin kanssa, ruutu 1" loading="lazy">
+            <img src="img/sivuttaisloikka-2.jpg" alt="Sivuttaisloikka vesisäkin kanssa, ruutu 2" loading="lazy">
+          </div>
+          <figcaption><span class="reel-name">Sivuttaisloikka vesisäkin kanssa</span><span class="reel-count"></span></figcaption>
+        </figure>
+        <div class="qual-body">
+          <h3>Quickness <span>Nopea reagointi</span></h3>
+          <p>Reaktiivinen snap: jalan nopea irtiotto rangan elastisuudella.</p>
+        </div>
+      </article>
+
+    </div>
+    <p class="hint">Kuvasarjat ovat liikkeen peräkkäisiä ruutuja. Vie osoitin kuvan päälle tai napauta, niin sarja pyörii.</p>
+
+    <div class="equip">
+      <div>
+        <p class="q-label">Väline · vesisäkki</p>
+        <h3>Epävakaa vesikuorma tuo jään epävarmuuden turvallisesti salille</h3>
+        <p>Vesi liikkuu jatkuvasti säkin sisällä. Hermosto ja keho joutuvat ratkaisemaan tasapainon ja voimantuoton ongelman uudelleen joka sekunti, samaan tapaan kuin jäällä. Tavoite ei ole nostaa mahdollisimman suurta painoa, vaan kehittää hermoston kykyä hallita liikettä nopeasti muuttuvissa tilanteissa.</p>
+        <ul>
+          <li>Reaktiivinen tasapaino ja koko kehon yhteistyö</li>
+          <li>Rotaation tuotto ja jarrutus hallitusti</li>
+          <li>Voimantuotto yhdellä jalalla epävakaassa tilanteessa</li>
+        </ul>
+        <p class="equip-note">Levytanko rakentaa maksimivoiman. Vesisäkin tarkoitus on tehdä siitä hallittavaa pelinopeudessa. Kumpikin tarvitaan, ja siirtymä jäälle mitataan, ei oleteta.</p>
+      </div>
+      <div>
+        <p class="q-label">Väline · BOSU</p>
+        <h3>Vahva tukijalka, pidempi liuku</h3>
+        <p>Luistelun liuku on yhden jalan tasapainotehtävä kapealla, epävakaalla alustalla. BOSU harjoittaa samaa yhden jalan hallintaa salilla. Mitä automaattisemmin tasapaino löytyy, sitä pidempi, rennompi ja taloudellisempi liuku.</p>
+        <ul>
+          <li>Yhden jalan tasapaino ja nilkan hallinta</li>
+          <li>Lonkan ja keskivartalon vakaus, kun toinen jalka liikkuu</li>
+          <li>Asentoaisti ja nopeat korjaukset pienistä häiriöistä huolimatta</li>
+        </ul>
+        <p class="equip-note">BOSU ei opeta liukua suoraan, eikä epävakaalla alustalla tuoteta yhtä paljon voimaa kuin vakaalla. Se on tasapainon ja hallinnan väline, ja liuku itse hioutuu vain jäällä.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 testit ================= -->
+  <section class="sec" id="testit">
+    <header class="sec-mark">
+      <span class="no">02 · Testit</span>
+      <h2>Mitä mitataan?</h2>
+    </header>
+
+    <p class="sec-intro">
+      Testaus tehdään yhteistyössä kansainvälisen urheilulaboratorion kanssa. Testauslaitteet
+      ja menetelmät on valittu tukemaan juuri niitä ominaisuuksia, joita SBAQ kehittää: nopeaa
+      voimantuottoa, elastista tehoa ja pelinomaista reagointia. Tavoite on tehdä harjoittelusta
+      mitattavaa ja tavoitteellista. Puolierot mitataan erikseen.
+    </p>
+
+    <table class="protocol">
+      <thead>
+        <tr><th scope="col">Nro</th><th scope="col">Osa-alue</th><th scope="col">Testi</th><th scope="col">Mitä saadaan?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="n">01</td>
+          <th scope="row">Kestävyys<small>Hapenottokyky</small></th>
+          <td>Suora hapenottotesti juoksumatolla hengityskaasuanalyysillä.</td>
+          <td><ul><li>VO<sub>2</sub>max</li><li>Kynnykset ja syketasot</li><li>Harjoittelun tehoalueet</li></ul></td>
+        </tr>
+        <tr>
+          <td class="n">02</td>
+          <th scope="row">Nopeus<small>Kiihdytys, sali ja jää</small></th>
+          <td>Valokennomittaus molemmissa ympäristöissä, jotta nähdään, siirtyykö teho luisteluun.</td>
+          <td><ul><li>10 m sprintti, sali</li><li>20 m luistelukiihdytys, jää</li><li>Väliajat ja kiihtyvyyskäyrä</li></ul></td>
+        </tr>
+        <tr>
+          <td class="n">03</td>
+          <th scope="row">Reaktio ja ketteryys<small>Pelinomainen reagointi</small></th>
+          <td>Valostimuluksiin perustuvat testit suunnanmuutoksista ja reagoinnista.</td>
+          <td><ul><li>Reaktioaika valoärsykkeeseen</li><li>505-ketteryystesti</li><li>Y-testi, monisuuntainen liike</li><li>Satunnainen reaktiotesti</li></ul></td>
+        </tr>
+        <tr>
+          <td class="n">04</td>
+          <th scope="row">Voima ja teho<small>Räjähtävyys ja puolierot</small></th>
+          <td>Kuinka paljon voimaa pelaaja tuottaa ja ennen kaikkea kuinka nopeasti?</td>
+          <td><ul><li>Kevennyshyppy (CMJ) ja Squat Jump</li><li>Single Leg Snap Drive, teho per jalka</li><li>Keiser-jalkaprässi, yhdellä ja kahdella</li><li>Huipputeho ja teho suhteessa painoon</li></ul></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="footnote">
+      Jokaisella testikerralla kirjataan lisäksi ikä, pituus, paino ja sarjataso, jotta
+      tulokset ovat suhteutettavissa myöhemmin. Eri testien lukuja ei verrata ristiin:
+      esimerkiksi Keiser-jalkaprässin W/kg ei ole vertailukelpoinen Wingate-pyörätestin
+      viitearvojen kanssa. Työkalun demossa on tällä hetkellä osa-alueen 04 testit;
+      muut lisätään sitä mukaa kuin mittausdataa kertyy.
+    </p>
+  </section>
+
+  <!-- ================= 03 menetelmä ================= -->
+  <section class="sec dark" id="menetelma">
+    <header class="sec-mark">
+      <span class="no">03 · Menetelmä</span>
+      <h2>Perusta on liike ja hermosto, ei pelkkä lihasvoima</h2>
+    </header>
+
+    <div class="method">
+      <div class="method-text">
+        <p class="sec-intro">
+          SBAQ:n painopiste on nopeassa voimantuotossa ja elastisessa tehossa.
+          Maksimivoiman ja kestävyyden pohja rakennetaan seuran perusharjoittelussa,
+          ja SBAQ tekee siitä käyttökelpoista pelinopeudessa. Siksi seurannan
+          painopiste on tehossa: maksimivoima voi pysyä paikallaan samalla kun
+          räjähtävyys nousee voimakkaasti. Työkalu on rakennettu näyttämään juuri
+          tämä ero.
+        </p>
+
+        <div class="principles">
+          <div>
+            <h3><span>a</span> Liike systeeminä</h3>
+            <p>Keho harjoitetaan kokonaisuutena, ei erillisinä lihaksina. Ajattelun ydin on, että voima syntyy keskivartalosta ja siirtyy ketjuna jalkaan ja jäähän.</p>
+          </div>
+          <div>
+            <h3><span>b</span> Teho ennen massaa</h3>
+            <p>Ensin hermoston kyky käyttää voimaa, vasta sen päälle lisää voimaa ja massaa. Näin uusi lihasmassa on toiminnallista.</p>
+          </div>
+          <div>
+            <h3><span>c</span> Kuormitus on väline</h3>
+            <p>Jaksotettu kuormitus tuottaa väliaikaisia notkahduksia testituloksiin. Kun ne on kirjattu, käyrän muoto on tulkittavissa oikein.</p>
+          </div>
+        </div>
+
+        <p class="footnote">
+          SBAQ ei perustu yhteen teoriaan, vaan yhdistää seitsemän lähestymistapaa: Spinal Engine
+          (Gracovetsky) · Triphasic (Dietz) · plyometriikka (Chu) · räjähtävä voima (Verkhoshansky) ·
+          hermosto ja taitokaaos (Marinovich) · faskialinjat (Myers, Gibbons) · motorinen oppiminen (Newell).
+        </p>
+      </div>
+
+      <figure class="triptych">
+        <div class="sheet-frames three">
+          <div class="fr"><img src="img/landmine-1.jpg" alt="Landmine-kyykky BOSUlla, ala-asento" loading="lazy"><b>01</b></div>
+          <div class="fr"><img src="img/landmine-2.jpg" alt="Landmine-kyykky BOSUlla, nousu alkaa" loading="lazy"><b>02</b></div>
+          <div class="fr"><img src="img/landmine-3.jpg" alt="Landmine-kyykky BOSUlla, tanko työnnetään ylös" loading="lazy"><b>03</b></div>
+        </div>
+        <figcaption><span>Ruudut 01-03</span><span>Landmine-kyykky BOSUlla</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="five">
+      <p class="q-label">Viisi periaatetta, joista SBAQ-harjoittelu tunnistetaan</p>
+      <ol>
+        <li><b>Yksijalkaisuus</b><span>Suurin osa luistelusta tapahtuu yhdellä jalalla. Harjoittelu vie sinne.</span></li>
+        <li><b>Rotaatiovoima</b><span>Voima syntyy keskeltä, selkärangan ja lantion kierrosta.</span></li>
+        <li><b>Hermoston optimointi</b><span>Reaktiivisuus, koordinaatio ja ajoitus ennen raakaa voimaa.</span></li>
+        <li><b>Testipohjainen seuranta</b><span>Kehitystä mitataan ja ohjataan datalla, ei tuntumalla.</span></li>
+        <li><b>Siirtovaikutus mitataan</b><span>Harjoitteet muistuttavat pelin liikkeitä. Siirtymä jäälle testataan luistelukiihdytyksellä, ei oleteta.</span></li>
+      </ol>
+    </div>
+
+    <div class="adds">
+      <p class="q-label">Mitä SBAQ lisää seuran nykyiseen fysiikkavalmennukseen</p>
+      <ul>
+        <li><b>Yhden jalan nopeusvoima pelinomaisissa asennoissa</b><span>Jarrutus, pito ja työntö samassa liikeradassa, epävakaalla alustalla ja rotaation kanssa. Seuran voimaharjoittelu rakentaa pohjan, SBAQ harjoittaa sen nopean ilmaisun.</span></li>
+        <li><b>Hermoston tilan mukaan rytmitetty kuormitus</b><span>Lyhyet, laadukkaat toistot ja täydet palautukset, jotta harjoittelu sopii pelikauteen. Kuormitusvastetta seurataan hyppytestillä ennen ja jälkeen harjoituksen.</span></li>
+        <li><b>Sama testiprotokolla koko kauden</b><span>Sama testaaja, sama laite, samat testit. Muutos suhteutetaan mittauksen vaihteluun ennen kuin siitä tehdään johtopäätöksiä.</span></li>
+        <li><b>Siirtovaikutuksen mittaaminen jäällä</b><span>Luistelukiihdytys valokennoilla samalla viikolla kuin salitestit, jotta nähdään, siirtyykö teho luisteluun.</span></li>
+      </ul>
+    </div>
+    <p class="footnote">
+      SBAQ ei kumoa seuran fysiikkavalmennusta eikä kilpaile sen kanssa. Nykyaikainen
+      fysiikkavalmennus tekee jo yksijalkaista työtä, plyometriaa ja nopeusvoimaa; SBAQ tuo
+      siihen liikkeen laadun painotuksen ja testipohjaisen seurannan samalla protokollalla.
+    </p>
+  </section>
+
+  <!-- ================= 04 tilanne ================= -->
+  <section class="sec" id="tilanne">
+    <header class="sec-mark">
+      <span class="no">04 · Tilanne</span>
+      <h2>Missä mennään?</h2>
+    </header>
+
+    <p class="sec-intro">Seurantatyökalu on kehitysvaiheessa. Tässä mitä on valmiina ja mitä tehdään seuraavaksi.</p>
+
+    <table class="status">
+      <tbody>
+        <tr class="is-done">
+          <td class="st"><i></i>Valmis</td>
+          <th scope="row">Selaimessa toimiva työkalu</th>
+          <td>Pelaajalista, pelaajanäkymä kehityskaarineen, vertailu, tulosten syöttö ja tulostettava raportti. Toimii ilman asennusta ja ilman ulkoisia kirjastoja.</td>
+        </tr>
+        <tr class="is-done">
+          <td class="st"><i></i>Valmis</td>
+          <th scope="row">Oikea testidata</th>
+          <td>Työkalu ajaa todellisia mittaustuloksia kevään ja kesän 2026 testijaksolta: kaksi pelaajaa, 20 testikertaa. Pelaajien nimet on pseudonymisoitu, mittausarvot ovat alkuperäisiä.</td>
+        </tr>
+        <tr class="is-wip">
+          <td class="st"><i></i>Työn alla</td>
+          <th scope="row">Taustatiedot testikertoihin</th>
+          <td>Ikä, pituus, paino ja sarjataso jokaiselle testikerralle. Ilman niitä tuloksia ei voi suhteuttaa ikään eikä sarjatasoon, vaan vain pelaajan omaan lähtötasoon.</td>
+        </tr>
+        <tr class="is-next">
+          <td class="st"><i></i>Seuraavaksi</td>
+          <th scope="row">Tallennus ja kirjautuminen</th>
+          <td>Tietokanta, käyttäjätunnukset ja roolit, jotta seuran data säilyy turvallisesti ja pelaaja näkee vain omansa.</td>
+        </tr>
+        <tr class="is-next">
+          <td class="st"><i></i>Seuraavaksi</td>
+          <th scope="row">Viitearvot</th>
+          <td>Julkaistut normit ja kertyneet kokemusarvot vertailukohdaksi sarjatasoittain ja ikäluokittain.</td>
+        </tr>
+        <tr class="is-next">
+          <td class="st"><i></i>Seuraavaksi</td>
+          <th scope="row">AI-avusteinen raportti</th>
+          <td>Numerot lasketaan datasta, ja kielimalli kirjoittaa niistä valmentajalle ja pelaajalle luettavan tulkinnan ja suositukset.</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+</main>
+
+<!-- ================= yhteys ================= -->
+<footer class="end" id="yhteys">
+  <div class="end-main">
+    <img class="end-shot" src="img/kuntopallo-1.jpg" alt="Pelaaja takaapäin kuvattuna polvillaan jumppapallon päällä, kuntopallo heittovalmiina" loading="lazy">
+    <div class="end-copy">
+    <p class="q-label">Yhteys</p>
+    <p class="end-line">
+      Palvelua kehitetään yhdessä seurojen kanssa. Jos haluat kokeilla työkalua oman
+      joukkueesi testituloksilla, kirjoita:
+    </p>
+    <a class="end-mail" href="mailto:info@sbaq.fi">info@sbaq.fi</a>
+    <dl class="end-card">
+      <div><dt>Yritys</dt><dd>SBAQ Academy Oy<br>Y-tunnus 3312345-3<br>Tampere</dd></div>
+      <div><dt>Seurayhteistyö ja myynti</dt><dd><a href="tel:+358505550123">+358 50 555 0123</a><br><a href="mailto:info@sbaq.fi">info@sbaq.fi</a></dd></div>
+      <div><dt>Valmennus ja testaus</dt><dd><a href="tel:+358405550187">+358 40 555 0187</a><br><a href="mailto:valmennus@sbaq.fi">valmennus@sbaq.fi</a></dd></div>
+    </dl>
+    <p class="end-note">
+      Yhteystiedot ovat demon esimerkkitietoja. Demo ei tallenna mitään palvelimelle:
+      testidata on sivun mukana tuleva pseudonymisoitu esimerkkiaineisto, eikä sivu
+      käytä evästeitä tai analytiikkaa. Seurojen omaa dataa käsitellään vasta
+      tallennuksen ja kirjautumisen valmistuttua.
+    </p>
+    </div>
+  </div>
+  <div class="end-base">
+    <span class="wordmark small">SBAQ</span>
+    <span>SBAQ Academy Oy · Speed · Balance · Agility · Quickness</span>
+    <a href="index.html">Etusivu</a>
+    <a href="app/index.html?kirjautunut=1">Katso demo</a>
+    <a href="#top">Sivun alkuun</a>
+  </div>
+</footer>
+
+<script src="site.js?v=20260922f"></script>
+</body>
+</html>

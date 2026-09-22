@@ -292,6 +292,27 @@ table { border-collapse: collapse; width: 100%; }
 
 /* ---------- kapeat näytöt ---------- */
 
+/* tarjous */
+.offer { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; counter-reset: o; }
+.offer li { counter-increment: o; border-top: 2px solid var(--tape); padding-top: 14px; }
+.offer li::before { content: "0" counter(o); display: block; font: 500 11.5px/1 var(--f-mono); color: var(--tape); margin-bottom: 10px; }
+.offer b { display: block; font-size: 19px; font-weight: 800; }
+.offer span { display: block; margin-top: 8px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+.sec:not(.dark) + .sec:not(.dark) { border-top: 1px solid var(--hair); }
+
+/* mitä SBAQ lisää */
+.adds { margin-top: 64px !important; }
+.adds ul { border-top: 1px solid var(--night-hair); }
+.adds li { display: grid; grid-template-columns: 4fr 8fr; column-gap: 24px; padding: 18px 0 19px; border-bottom: 1px solid var(--night-hair); }
+.adds b { font-size: 17px; font-weight: 800; }
+.adds span { font-size: 15px; line-height: 1.55; color: var(--night-text); }
+
+/* alasivun otsikko */
+.sub-head { max-width: var(--max); margin: 0 auto; padding: clamp(48px, 6vw, 80px) var(--pad) 0; }
+.sub-head h1 { font: 800 clamp(30px, 3.6vw, 48px)/1.1 var(--f); font-stretch: 92%; letter-spacing: -.012em; max-width: 18em; }
+.sub-head .lead { margin-top: 18px; max-width: 40em; font-size: 17.5px; color: var(--ink-2); }
+.sub-head .dateline { color: var(--tape); }
+
 /* case: yksi pelaaja, kolme jaksoa */
 .story.four { grid-template-columns: repeat(4, 1fr); gap: 28px; }
 .case-time { margin-top: 44px; }
@@ -342,6 +363,7 @@ table { border-collapse: collapse; width: 100%; }
   .five ol { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
   .people { grid-template-columns: 1fr; row-gap: 36px; }
   .story.four { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
+  .offer { grid-template-columns: 1fr; gap: 24px; }
   .case { grid-template-columns: 1fr; row-gap: 32px; }
 }
 @media (max-width: 700px) {
@@ -359,6 +381,7 @@ table { border-collapse: collapse; width: 100%; }
   .qual-letter { display: none; }
   .flow { grid-template-columns: 1fr; gap: 24px; }
   .principles > div { grid-template-columns: 1fr; row-gap: 6px; }
+  .adds li { grid-template-columns: 1fr; row-gap: 6px; }
   .five ol { grid-template-columns: 1fr; }
   .story, .story.four { grid-template-columns: 1fr; gap: 24px; }
   .exp li { grid-template-columns: 1fr; row-gap: 2px; }

@@ -41,7 +41,8 @@ const avg = (a, b) => Math.round(((a + b) / 2) * 10) / 10;
 const parseD = (iso) => new Date(iso + 'T00:00:00Z');
 const fmtD = (iso) => { const d = parseD(iso); return `${d.getUTCDate()}.${d.getUTCMonth() + 1}.${String(d.getUTCFullYear()).slice(2)}`; };
 const fmtDLong = (iso) => { const d = parseD(iso); return `${d.getUTCDate()}.${d.getUTCMonth() + 1}.${d.getUTCFullYear()}`; };
-const num = (v, unit) => v == null ? '-' : Number(v).toFixed(unit === 's' ? 2 : unit === 'W' ? 0 : 1);
+const fi = (v) => String(v).replace('.', ',');
+const num = (v, unit) => v == null ? '-' : Number(v).toFixed(unit === 's' ? 2 : unit === 'W' ? 0 : 1).replace('.', ',');
 const leagueOf = (code) => D.leagues.find((l) => l.code === code) || { code, name: code, level: 0 };
 // distinct, clearly separable colour per league
 const LEAGUE_COLORS = {
@@ -69,9 +70,9 @@ function nearestSession(q, age, tol = 1.5) {
 }
 function trendHtml(pct) {
   if (pct == null) return '<span class="trend-flat">-</span>';
-  if (pct > 1.5) return `<span class="trend-up">▲ ${pct.toFixed(1)}%</span>`;
-  if (pct < -1.5) return `<span class="trend-down">▼ ${Math.abs(pct).toFixed(1)}%</span>`;
-  return `<span class="trend-flat">≈ ${pct.toFixed(1)}%</span>`;
+  if (pct > 1.5) return `<span class="trend-up">▲ ${pct.toFixed(1).replace('.', ',')} %</span>`;
+  if (pct < -1.5) return `<span class="trend-down">▼ ${Math.abs(pct).toFixed(1).replace('.', ',')} %</span>`;
+  return `<span class="trend-flat">≈ ${pct.toFixed(1).replace('.', ',')} %</span>`;
 }
 /* Percentile rank of `value` within a peer group (peers EXCLUDE the player).
    The player is included in the population and mid-ranks are used, so the
@@ -90,7 +91,7 @@ function pctClass(p) { return p == null ? '' : p >= 66 ? 'good' : p >= 33 ? 'war
 function diffHtml(now, ref, m) {
   const d = now - ref;
   const better = m.hb ? d >= 0 : d <= 0;
-  const txt = (d > 0 ? '+' : '') + d.toFixed(m.unit === 's' ? 2 : 1);
+  const txt = (d > 0 ? '+' : '') + d.toFixed(m.unit === 's' ? 2 : 1).replace('.', ',');
   return `<span class="${better ? 'good' : 'bad'}">${txt} ${m.unit}</span>`;
 }
 
@@ -290,7 +291,7 @@ function renderRoster() {
       ${rows.map(({ p, imp, latest, inj }) => `
         <tr data-id="${p.id}">
           <td><div class="pname">${esc(p.name)}</div><div class="psub">${p.sessions.length} testiä · ${fmtD(first(p).date)} ... ${fmtD(last(p).date)}</div></td>
-          ${HAS_AGES ? `<td class="num">${p.age.toFixed(1)}</td>` : ''}
+          ${HAS_AGES ? `<td class="num">${p.age.toFixed(1).replace('.', ',')}</td>` : ''}
           ${HAS_LEAGUES ? `<td>${leagueBadge(p.currentLeague)}</td>` : ''}
           ${hasPos ? `<td>${esc(p.position || '-')}</td>` : ''}
           <td class="num">${latest == null ? '<span class="psub">-</span>' : num(latest, m.unit) + ' ' + m.unit}</td>
@@ -350,7 +351,7 @@ function renderPlayer(id) {
         <div class="big">${esc(p.name)}</div>
         ${sub ? `<div class="psub">${esc(sub)}</div>` : ''}
       </div>
-      ${stat('Ikä nyt', p.age == null ? null : p.age.toFixed(1) + ' v')}
+      ${stat('Ikä nyt', p.age == null ? null : p.age.toFixed(1).replace('.', ',') + ' v')}
       ${stat('Sarjataso nyt', p.currentLeague == null ? null : leagueBadge(p.currentLeague))}
       ${stat('Pituus nyt', L.heightCm == null ? null : L.heightCm + ' cm')}
       ${stat('Paino nyt', (L.weightKg ?? p.weightKg) == null ? null : (L.weightKg ?? p.weightKg) + ' kg')}
@@ -558,7 +559,7 @@ function renderBalanceCard(p) {
           <td>${esc(r.x.label)}<div class="psub">uusin: ${fmtD(r.s.date)}</div></td>
           <td class="num">${num(r.o.right, r.x.unit)} ${r.x.unit}</td>
           <td class="num">${num(r.o.left, r.x.unit)} ${r.x.unit}</td>
-          <td class="num"><span class="${r.asym < 5 ? 'good' : r.asym < 10 ? 'warn' : 'bad'}">${r.asym.toFixed(1)} %</span></td>
+          <td class="num"><span class="${r.asym < 5 ? 'good' : r.asym < 10 ? 'warn' : 'bad'}">${r.asym.toFixed(1).replace('.', ',')} %</span></td>
         </tr>`).join('')}</tbody>
     </table>`));
 
@@ -668,10 +669,10 @@ function renderRatiosCard(p) {
   const na = '<span class="psub">ei mitattu</span>';
   const row = (k, r, fmt, cls, note) => `<div class="kv-row"><span class="k">${k}<div class="psub">${note}${r ? ' · ' + fmtD(r.s.date) : ''}</div></span><span class="v ${r ? cls(r.v) : ''}">${r ? fmt(r.v) : na}</span></div>`;
   card.appendChild(el(`<div>
-    ${row('SSC eli elastisuus (CMJ vs SJ)', ssc, (v) => v.toFixed(1) + ' %', (v) => v >= 5 ? 'good' : v >= 2 ? 'warn' : 'bad', 'Optimi +10...15 %')}
-    ${row('Bilateraalinen suhde', bilat, (v) => v.toFixed(2), (v) => v >= 0.9 && v <= 1.1 ? 'good' : 'warn', 'Normaali 0,90...1,10')}
-    ${row('Sivuasymmetria (CMJ)', asym, (v) => v.toFixed(1) + ' %', (v) => v < 5 ? 'good' : v < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
-    ${row('Sivuasymmetria (Snap Drive)', snapAsym, (v) => v.toFixed(1) + ' %', (v) => v < 5 ? 'good' : v < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
+    ${row('SSC eli elastisuus (CMJ vs SJ)', ssc, (v) => v.toFixed(1).replace('.', ',') + ' %', (v) => v >= 5 ? 'good' : v >= 2 ? 'warn' : 'bad', 'Optimi +10...15 %')}
+    ${row('Bilateraalinen suhde', bilat, (v) => v.toFixed(2).replace('.', ','), (v) => v >= 0.9 && v <= 1.1 ? 'good' : 'warn', 'Normaali 0,90...1,10')}
+    ${row('Sivuasymmetria (CMJ)', asym, (v) => v.toFixed(1).replace('.', ',') + ' %', (v) => v < 5 ? 'good' : v < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
+    ${row('Sivuasymmetria (Snap Drive)', snapAsym, (v) => v.toFixed(1).replace('.', ',') + ' %', (v) => v < 5 ? 'good' : v < 10 ? 'warn' : 'bad', 'Optimi alle 5 %')}
   </div>`));
   return card;
 }
@@ -702,7 +703,7 @@ function renderCompare() {
   const ctl = el('<div class="card"></div>');
   ctl.appendChild(el(`<h3>Vertaa pelaajaa <span class="sub">ikä-täsmätty hajonta tai kehityskaari yli ajan</span></h3>`));
   const playerOpts = D.players.map((p) => {
-    const meta = [p.age == null ? null : p.age.toFixed(1) + ' v', p.currentLeague].filter(Boolean).join(', ');
+    const meta = [p.age == null ? null : p.age.toFixed(1).replace('.', ',') + ' v', p.currentLeague].filter(Boolean).join(', ');
     return `<option value="${p.id}" ${p.id === focus.id ? 'selected' : ''}>${esc(p.name)}${meta ? ` (${meta})` : ''}</option>`;
   }).join('');
   const leagueOpts = (D.leagues || []).filter((l) => D.players.some((p) => p.sessions.some((s) => s.league === l.code)))
@@ -718,7 +719,7 @@ function renderCompare() {
       <option value="same" ${state.compareLeague === 'same' ? 'selected' : ''}>Sama kuin fokus</option>
       ${leagueOpts}
     </select></label>` : ''}
-    ${scatterMode ? `<label class="fld"><span>Vertailuikä: <b id="caLbl">${state.compareAge.toFixed(1)} v</b></span>
+    ${scatterMode ? `<label class="fld"><span>Vertailuikä: <b id="caLbl">${state.compareAge.toFixed(1).replace('.', ',')} v</b></span>
       <input id="ca" type="range" min="12" max="26" step="0.5" value="${state.compareAge}"></label>` : ''}
   </div>`));
   const modeRow = el(`<div class="mchips" style="margin-bottom:10px">
@@ -746,7 +747,7 @@ function renderCompare() {
   const mt = modeRow.querySelector('#mTrend'); if (mt) mt.onclick = () => { state.compareMode = 'trend'; render(); };
   const ca = ctl.querySelector('#ca');
   if (ca) {
-    ca.oninput = (e) => { ctl.querySelector('#caLbl').textContent = Number(e.target.value).toFixed(1) + ' v'; };
+    ca.oninput = (e) => { ctl.querySelector('#caLbl').textContent = Number(e.target.value).toFixed(1).replace('.', ',') + ' v'; };
     ca.onchange = (e) => { state.compareAge = Number(e.target.value); render(); };
   }
   return wrap;
@@ -763,25 +764,25 @@ function renderCompareScatter(wrap, focus, m, posF) {
 
   const stat = el('<div class="card"></div>');
   const focalNote = focal
-    ? `${esc(focus.name)} iässä ${focal.age.toFixed(1)} v (mitattu ${fmtD(focal.s.date)}, ${focal.league})`
-    : `${esc(focus.name)}: ei testiä lähellä ikää ${state.compareAge.toFixed(1)} v${posF ? ' tällä pelipaikkarajauksella' : ''}`;
+    ? `${esc(focus.name)} iässä ${focal.age.toFixed(1).replace('.', ',')} v (mitattu ${fmtD(focal.s.date)}, ${focal.league})`
+    : `${esc(focus.name)}: ei testiä lähellä ikää ${state.compareAge.toFixed(1).replace('.', ',')} v${posF ? ' tällä pelipaikkarajauksella' : ''}`;
   stat.appendChild(el(`
     <div class="cmp-stats">
       <div class="stat"><span class="k">Fokus</span><span class="v">${focalVal == null ? '-' : num(focalVal, m.unit) + ' ' + m.unit}</span><span class="psub">${focalNote}</span></div>
-      <div class="stat"><span class="k">Vertailtavia</span><span class="v">${others.length}</span><span class="psub">${posF ? esc(posF) + ', ' : ''}ikä ${state.compareAge.toFixed(1)} v</span></div>
+      <div class="stat"><span class="k">Vertailtavia</span><span class="v">${others.length}</span><span class="psub">${posF ? esc(posF) + ', ' : ''}ikä ${state.compareAge.toFixed(1).replace('.', ',')} v</span></div>
       <div class="stat"><span class="k">Keskiarvo</span><span class="v">${mean == null ? '-' : num(mean, m.unit) + ' ' + m.unit}</span><span class="psub">vertailtavien ka</span></div>
       <div class="stat"><span class="k">Percentiili</span><span class="v ${pctClass(pctl)}">${pctl == null ? '-' : pctl + '.'}</span><span class="psub">osuus jotka fokus ylittää</span></div>
     </div>`));
   wrap.appendChild(stat);
 
   const chart = el('<div class="card"></div>');
-  chart.appendChild(el(`<h3>Hajonta vertailuikänä <span class="sub">${esc(m.label)} ${m.unit} · ikä ${state.compareAge.toFixed(1)} v ±1,5 v${posF ? ' · ' + esc(posF) : ''}</span></h3>`));
+  chart.appendChild(el(`<h3>Hajonta vertailuikänä <span class="sub">${esc(m.label)} ${m.unit} · ikä ${state.compareAge.toFixed(1).replace('.', ',')} v ±1,5 v${posF ? ' · ' + esc(posF) : ''}</span></h3>`));
   if (filtered.length) {
     const pts = filtered.map((d) => ({ x: d.age, y: d.val, level: d.level, self: d.self, name: d.p.name, league: d.league, pid: d.p.id }));
     const svg = scatterChart(pts, { unit: m.unit, hb: m.hb, xlo: state.compareAge - 2, xhi: state.compareAge + 2, vline: state.compareAge });
     attachPointClicks(svg);
     chart.appendChild(svg);
-    chart.appendChild(el(`<div class="callout">Klikkaa pistettä avataksesi pelaajan. Jokainen piste on tulos siitä testistä, joka on lähimpänä ikää ${state.compareAge.toFixed(1)} v, joten esim. 22-vuotiaasta näkyy 18-vuotiaana tehty tulos. Väri on sarjataso kyseisessä testissä. <b>Fokuspelaaja on korostettu.</b></div>`));
+    chart.appendChild(el(`<div class="callout">Klikkaa pistettä avataksesi pelaajan. Jokainen piste on tulos siitä testistä, joka on lähimpänä ikää ${state.compareAge.toFixed(1).replace('.', ',')} v, joten esim. 22-vuotiaasta näkyy 18-vuotiaana tehty tulos. Väri on sarjataso kyseisessä testissä. <b>Fokuspelaaja on korostettu.</b></div>`));
   } else {
     chart.appendChild(el('<div class="empty">Ei vertailtavia tuloksia tällä rajauksella.</div>'));
   }
@@ -927,7 +928,7 @@ function openTestForm(p, existing) {
   /* Empty stays null. Only a number entered by the user becomes a measurement. */
   const gv = (id) => { const n = $('#f_' + id); if (!n || n.value.trim() === '') return null; const v = parseFloat(n.value); return Number.isFinite(v) ? v : null; };
   const ageBox = $('#f_age');
-  const updateAge = () => { if (!ageBox) return; const d = $('#f_date').value; ageBox.value = d ? ((parseD(d) - parseD(p.birthDate)) / YEAR).toFixed(1) + ' v' : ''; };
+  const updateAge = () => { if (!ageBox) return; const d = $('#f_date').value; ageBox.value = d ? ((parseD(d) - parseD(p.birthDate)) / YEAR).toFixed(1).replace('.', ',') + ' v' : ''; };
   $('#f_date').oninput = updateAge; updateAge();
 
   const close = () => back.remove();
@@ -1017,7 +1018,7 @@ function plotFrame(W, H, mg, xTicks, yTicks, xToPx, yToPx) {
   for (const yt of yTicks) {
     const y = yToPx(yt);
     g += `<line x1="${mg.l}" y1="${y}" x2="${W - mg.r}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
-    g += `<text x="${mg.l - 8}" y="${y + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${yt}</text>`;
+    g += `<text x="${mg.l - 8}" y="${y + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${fi(yt)}</text>`;
   }
   for (const xt of xTicks) g += `<text x="${xToPx(xt.v)}" y="${H - mg.b + 18}" fill="var(--muted)" font-size="11" text-anchor="middle">${xt.label}</text>`;
   return g;
@@ -1153,7 +1154,7 @@ function reportCurve(points, refPoints) {
   const pad = (yhi - ylo) * 0.18 || 1; ylo -= pad; yhi += pad;
   const xToPx = (t) => mg.l + (xhi === xlo ? 0.5 : (t - xlo) / (xhi - xlo)) * (W - mg.l - mg.r);
   const yToPx = (v) => H - mg.b - (v - ylo) / (yhi - ylo) * (H - mg.t - mg.b);
-  const grid = ticks(ylo + pad * 0.4, yhi - pad * 0.4, 4).map((yt) => { const y = yToPx(yt); return `<line x1="${mg.l}" y1="${y}" x2="${W - mg.r}" y2="${y}" stroke="#e7e0d5"/><text x="${mg.l - 6}" y="${y + 3}" fill="#a49c90" font-size="10" text-anchor="end">${yt}</text>`; }).join('');
+  const grid = ticks(ylo + pad * 0.4, yhi - pad * 0.4, 4).map((yt) => { const y = yToPx(yt); return `<line x1="${mg.l}" y1="${y}" x2="${W - mg.r}" y2="${y}" stroke="#e7e0d5"/><text x="${mg.l - 6}" y="${y + 3}" fill="#a49c90" font-size="10" text-anchor="end">${fi(yt)}</text>`; }).join('');
   const xt = points.filter((_, i, a) => a.length <= 6 || i % Math.ceil(a.length / 6) === 0 || i === a.length - 1)
     .map((p) => `<text x="${xToPx(p.t).toFixed(1)}" y="${H - 8}" fill="#a49c90" font-size="10" text-anchor="middle">${fmtD(p.s.date)}</text>`).join('');
   let refLine = '';
@@ -1219,7 +1220,7 @@ function renderReport(pid, sid) {
   // strengths and development areas
   const strengths = [];
   rows.forEach((r) => { if (r.pc != null && r.pc >= 66) strengths.push(`${r.m.label}: vahva sarjassa (percentiili ${r.pc}.)`); });
-  rows.forEach((r) => { if (r.cB != null && r.cB > 6) strengths.push(`${r.m.label}: +${r.cB.toFixed(1)} % lähtötasosta`); });
+  rows.forEach((r) => { if (r.cB != null && r.cB > 6) strengths.push(`${r.m.label}: +${r.cB.toFixed(1).replace('.', ',')} % lähtötasosta`); });
   if (asymCmj != null && asymCmj < 5) strengths.push('Tasapainoinen ponnistus, CMJ-sivuasymmetria alle 5 %');
   if (ssc != null && ssc >= 8) strengths.push('Hyvä elastisuus (SSC)');
   const strengthsU = [...new Set(strengths)].slice(0, 5);
@@ -1227,10 +1228,10 @@ function renderReport(pid, sid) {
 
   const devAreas = [];
   rows.forEach((r) => { if (r.pc != null && r.pc <= 33) devAreas.push(`${r.m.label}: alle sarjatason (percentiili ${r.pc}.)`); });
-  rows.forEach((r) => { if (r.cP != null && r.cP < -3) devAreas.push(`${r.m.label}: ${r.cP.toFixed(1)} % edellisestä${activeInjury ? ', loukkaantuminen huomioiden' : ''}`); });
-  if (asymCmj != null && asymCmj > 8) devAreas.push(`Sivuasymmetria ${asymCmj.toFixed(1)} % (tavoite alle 5 %), heikompi ${weakSide}`);
+  rows.forEach((r) => { if (r.cP != null && r.cP < -3) devAreas.push(`${r.m.label}: ${r.cP.toFixed(1).replace('.', ',')} % edellisestä${activeInjury ? ', loukkaantuminen huomioiden' : ''}`); });
+  if (asymCmj != null && asymCmj > 8) devAreas.push(`Sivuasymmetria ${asymCmj.toFixed(1).replace('.', ',')} % (tavoite alle 5 %), heikompi ${weakSide}`);
   if (ssc != null && ssc < 3) devAreas.push('Matala elastisuus (SSC)');
-  if (snapAsym != null && snapAsym > 8) devAreas.push(`Snap Drive -sivuasymmetria ${snapAsym.toFixed(1)} % (tavoite alle 5 %)`);
+  if (snapAsym != null && snapAsym > 8) devAreas.push(`Snap Drive -sivuasymmetria ${snapAsym.toFixed(1).replace('.', ',')} % (tavoite alle 5 %)`);
   const devU = [...new Set(devAreas)].slice(0, 5);
   if (!devU.length) devU.push('Ei merkittäviä kehityskohteita tässä testissä.');
 
@@ -1247,7 +1248,7 @@ function renderReport(pid, sid) {
     ...otherEvents.map((a) => `<li><b>${esc(a.title)}</b>: ${esc(a.note)}</li>`),
   ];
 
-  const fmtChg = (c) => c == null ? '<span class="rp-mut">-</span>' : `<span class="${c > 1.5 ? 'rp-up' : c < -1.5 ? 'rp-down' : 'rp-mut'}">${c > 0 ? '+' : ''}${c.toFixed(1)} %</span>`;
+  const fmtChg = (c) => c == null ? '<span class="rp-mut">-</span>' : `<span class="${c > 1.5 ? 'rp-up' : c < -1.5 ? 'rp-down' : 'rp-mut'}">${c > 0 ? '+' : ''}${c.toFixed(1).replace('.', ',')} %</span>`;
 
   // development chart (CMJ) with the shifting own-league benchmark
   const cm = headRow ? headRow.m : metric('cmj');
@@ -1286,11 +1287,11 @@ function renderReport(pid, sid) {
       <section><h4>Tiivistelmä</h4>
         <div class="rp-tldr">
           <div class="rp-cardlet"><div class="k">${headRow ? esc(headRow.m.label) : 'Tulos'} nyt</div><div class="v">${!headRow || headRow.now == null ? '-' : num(headRow.now, headRow.m.unit) + ' ' + headRow.m.unit}</div><div class="s">vs edellinen ${fmtChg(headRow && headRow.cP)}</div></div>
-          <div class="rp-cardlet"><div class="k">Suurin kehitys</div><div class="v">${bestB ? '+' + bestB.cB.toFixed(1) + ' %' : '-'}</div><div class="s">${bestB ? esc(bestB.m.label) : 'lähtötasosta'}</div></div>
+          <div class="rp-cardlet"><div class="k">Suurin kehitys</div><div class="v">${bestB ? '+' + bestB.cB.toFixed(1).replace('.', ',') + ' %' : '-'}</div><div class="s">${bestB ? esc(bestB.m.label) : 'lähtötasosta'}</div></div>
           ${HAS_PEERS && headRow
             ? `<div class="rp-cardlet"><div class="k">${esc(headRow.m.label)} sarjassa ${esc(session.league)}</div><div class="v">${headRow.pc == null ? '-' : headRow.pc + '.'}</div><div class="s">percentiili${headRow.pc == null ? ', liian pieni joukko' : ' (' + headRow.nPeers + ' vertailtavaa)'}</div></div>`
             : `<div class="rp-cardlet"><div class="k">Mitattu</div><div class="v">${rows.length}</div><div class="s">testiä tällä kerralla</div></div>`}
-          <div class="rp-cardlet"><div class="k">Kehitys lähtötasosta</div><div class="v">${avgCb == null ? '-' : (avgCb > 0 ? '+' : '') + avgCb.toFixed(1) + ' %'}</div><div class="s">keskimäärin testeittäin</div></div>
+          <div class="rp-cardlet"><div class="k">Kehitys lähtötasosta</div><div class="v">${avgCb == null ? '-' : (avgCb > 0 ? '+' : '') + avgCb.toFixed(1).replace('.', ',') + ' %'}</div><div class="s">keskimäärin testeittäin</div></div>
         </div>
         <div class="rp-verdict"><b>Kokonaisarvio:</b> ${verdict}</div>
       </section>
@@ -1318,11 +1319,11 @@ function renderReport(pid, sid) {
 
       <section><h4>Suhdeluvut (SBAQ-profiilin laatu)</h4>
         <ul class="rp-ratios">
-          <li>SSC eli elastisuus (CMJ vs SJ): <b>${ssc == null ? '-' : ssc.toFixed(1) + ' %'}</b> <span class="rp-mut">(optimi +10...15 %)</span></li>
-          <li>Bilateraalinen suhde: <b>${hasCmj ? (cmj.both / (cmj.right + cmj.left)).toFixed(2) : '-'}</b> <span class="rp-mut">(normaali 0,90...1,10)</span></li>
-          <li>CMJ-sivuasymmetria: <b>${asymCmj == null ? '-' : asymCmj.toFixed(1) + ' %'}</b> <span class="rp-mut">(optimi alle 5 %)</span></li>
-          <li>Snap Drive -sivuasymmetria: <b>${snapAsym == null ? '-' : snapAsym.toFixed(1) + ' %'}</b> <span class="rp-mut">(optimi alle 5 %)</span></li>
-          <li>Keiser, teho suhteessa painoon: <b>${mm.keiser.wattsPerKg == null ? '-' : mm.keiser.wattsPerKg.toFixed(1) + ' W/kg'}</b> <span class="rp-mut">${mm.keiser.watts == null ? '' : '(' + mm.keiser.watts + ' W)'}</span></li>
+          <li>SSC eli elastisuus (CMJ vs SJ): <b>${ssc == null ? '-' : ssc.toFixed(1).replace('.', ',') + ' %'}</b> <span class="rp-mut">(optimi +10...15 %)</span></li>
+          <li>Bilateraalinen suhde: <b>${hasCmj ? (cmj.both / (cmj.right + cmj.left)).toFixed(2).replace('.', ',') : '-'}</b> <span class="rp-mut">(normaali 0,90...1,10)</span></li>
+          <li>CMJ-sivuasymmetria: <b>${asymCmj == null ? '-' : asymCmj.toFixed(1).replace('.', ',') + ' %'}</b> <span class="rp-mut">(optimi alle 5 %)</span></li>
+          <li>Snap Drive -sivuasymmetria: <b>${snapAsym == null ? '-' : snapAsym.toFixed(1).replace('.', ',') + ' %'}</b> <span class="rp-mut">(optimi alle 5 %)</span></li>
+          <li>Keiser, teho suhteessa painoon: <b>${mm.keiser.wattsPerKg == null ? '-' : mm.keiser.wattsPerKg.toFixed(1).replace('.', ',') + ' W/kg'}</b> <span class="rp-mut">${mm.keiser.watts == null ? '' : '(' + mm.keiser.watts + ' W)'}</span></li>
         </ul>
       </section>
 
