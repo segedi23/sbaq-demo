@@ -55,3 +55,18 @@
   });
 
 })();
+
+/* ---------- valikko kapealla näytöllä ---------- */
+(function () {
+  "use strict";
+  var mast = document.querySelector(".mast");
+  var btn = document.querySelector(".mast-menu");
+  if (!mast || !btn) return;
+  function set(open) {
+    mast.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  btn.addEventListener("click", function () { set(!mast.classList.contains("open")); });
+  mast.querySelectorAll(".mast-nav a").forEach(function (a) { a.addEventListener("click", function () { set(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") set(false); });
+})();

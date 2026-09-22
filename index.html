@@ -4,27 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SBAQ Academy. Speed, Balance, Agility, Quickness</title>
-  <meta name="description" content="SBAQ Academy rakentaa pelaajan, joka on vahvin, kestävin ja taitavin jäällä. Harjoittelu mitataan yhteistyössä Sport Labin kanssa, ja seurantatyökalu näyttää, miten pelaaja kehittyy." />
+  <meta name="description" content="SBAQ Academy rakentaa pelaajan, joka on vahvin, kestävin ja taitavin jäällä. Harjoittelu mitataan yhteistyössä urheilulaboratorion kanssa, ja seurantatyökalu näyttää, miten pelaaja kehittyy." />
+  <link rel="canonical" href="https://segedi23.github.io/sbaq-demo/" />
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fi_FI" />
+  <meta property="og:site_name" content="SBAQ Academy" />
+  <meta property="og:title" content="SBAQ Academy. Jääkiekon fysiikkavalmennus, testaus ja seurantatyökalu" />
+  <meta property="og:description" content="Harjoittelu mitataan ja tulosten pitää näkyä jäällä. Katso demo ja yhden pelaajan case: mitä tapahtuu, kun harjoittelu muuttuu." />
+  <meta property="og:url" content="https://segedi23.github.io/sbaq-demo/" />
+  <meta property="og:image" content="https://segedi23.github.io/sbaq-demo/img/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="site.css?v=20260917x" />
+  <link rel="stylesheet" href="site.css?v=20260922c" />
 </head>
 <body id="top">
 
 <header class="mast">
   <div class="mast-in">
     <a class="wordmark" href="#top" aria-label="SBAQ, sivun alkuun">SBAQ</a>
-    <nav class="mast-nav" aria-label="Sivun osat">
+    <nav class="mast-nav" id="mast-nav" aria-label="Sivun osat">
       <a href="#ominaisuudet">SBAQ</a>
       <a href="#tyokalu">Työkalu</a>
       <a href="#testit">Testit</a>
       <a href="#menetelma">Menetelmä</a>
+      <a href="#case">Case</a>
       <a href="#tekijat">Tekijät</a>
       <a href="#tilanne">Tilanne</a>
       <a href="#yhteys">Yhteys</a>
     </nav>
-    <a class="mast-tool" href="app/kirjaudu.html">Avaa työkalu</a>
+    <a class="mast-tool" href="app/kirjaudu.html">Katso demo</a>
+    <button class="mast-menu" type="button" aria-expanded="false" aria-controls="mast-nav">Valikko</button>
   </div>
 </header>
 
@@ -40,7 +55,7 @@
     </div>
     <div class="hero-in">
       <div class="hero-text">
-        <p class="dateline">SBAQ Academy · jääkiekon fysiikkavalmennus ja testaus</p>
+        <p class="dateline">SBAQ Academy · jääkiekon fysiikkavalmennus, testaus ja seurantatyökalu</p>
         <h1>Vahvin, kestävin ja taitavin. <i>Jäällä.</i></h1>
         <p class="lead">
           Emme rakenna pelaajaa kuntosalia tai laboratoriota varten. Rakennamme pelaajan,
@@ -48,8 +63,12 @@
           kovassa vauhdissa ja kontaktissa. Kaikki, mitä salilla tehdään, mitataan, ja
           harjoittelun vaikutuksen pitää näkyä jäällä.
         </p>
+        <p class="hero-offer">
+          Seuralle tämä on kolme asiaa samassa kokonaisuudessa: SBAQ-harjoittelu,
+          säännöllinen testaus ja työkalu, josta näkee, mitä harjoittelu tuottaa.
+        </p>
         <p class="hero-links">
-          <a class="go" href="app/kirjaudu.html">Avaa työkalu</a>
+          <a class="go" href="app/kirjaudu.html">Katso demo</a>
           <a class="under" href="#ominaisuudet">Tutustu SBAQ:hon</a>
         </p>
         <p class="hero-note">Mitataan · Kehitetään · Siirretään jäälle</p>
@@ -259,7 +278,7 @@
     </header>
 
     <p class="sec-intro">
-      SBAQ Academy tekee yhteistyötä suuren kansainvälisen Sport Labin kanssa. Testauslaitteet
+      Testaus tehdään yhteistyössä kansainvälisen urheilulaboratorion kanssa. Testauslaitteet
       ja menetelmät on valittu tukemaan juuri niitä ominaisuuksia, joita SBAQ kehittää: nopeaa
       voimantuottoa, elastista tehoa ja pelinomaista reagointia. Tavoite on tehdä harjoittelusta
       mitattavaa ja tavoitteellista. Puolierot mitataan erikseen.
@@ -301,7 +320,8 @@
       Jokaisella testikerralla kirjataan lisäksi ikä, pituus, paino ja sarjataso, jotta
       tulokset ovat suhteutettavissa myöhemmin. Eri testien lukuja ei verrata ristiin:
       esimerkiksi Keiser-jalkaprässin W/kg ei ole vertailukelpoinen Wingate-pyörätestin
-      viitearvojen kanssa.
+      viitearvojen kanssa. Työkalun demossa on tällä hetkellä osa-alueen 04 testit;
+      muut lisätään sitä mukaa kuin mittausdataa kertyy.
     </p>
   </section>
 
@@ -315,10 +335,12 @@
     <div class="method">
       <div class="method-text">
         <p class="sec-intro">
-          SBAQ kehittää nopeaa voimantuottoa ja elastista tehoa, ei maksimivoimaa.
-          Siksi seurannan painopiste on tehossa ja sen kehityksessä: maksimivoima voi
-          pysyä paikallaan samalla kun räjähtävyys nousee voimakkaasti. Työkalu on
-          rakennettu näyttämään juuri tämä ero.
+          SBAQ:n painopiste on nopeassa voimantuotossa ja elastisessa tehossa.
+          Maksimivoiman ja kestävyyden pohja rakennetaan seuran perusharjoittelussa,
+          ja SBAQ tekee siitä käyttökelpoista pelinopeudessa. Siksi seurannan
+          painopiste on tehossa: maksimivoima voi pysyä paikallaan samalla kun
+          räjähtävyys nousee voimakkaasti. Työkalu on rakennettu näyttämään juuri
+          tämä ero.
         </p>
 
         <div class="principles">
@@ -366,13 +388,13 @@
 
     <table class="ledger versus">
       <thead>
-        <tr><th scope="col" class="ledger-k"></th><th scope="col">Perinteinen valmennus</th><th scope="col">SBAQ</th></tr>
+        <tr><th scope="col" class="ledger-k"></th><th scope="col">Perinteinen fysiikkaharjoittelu</th><th scope="col">SBAQ</th></tr>
       </thead>
       <tbody>
-        <tr><th scope="row">Lähtökohta</th><td>Fysiologia ja mittarit. Ominaisuuksia tarkastellaan enimmäkseen erikseen.</td><td>Liike ja hermosto. Keho nähdään kokonaisuutena: faskia, selkäranka ja hermosto yhdessä.</td></tr>
-        <tr><th scope="row">Harjoittelu</th><td>Lineaarinen ja jaksotettu. Voima, nopeus ja kestävyys harjoitellaan erillisinä osina.</td><td>Integroitu ja rytmitetty. Nopeus, voima ja koordinaatio kehitetään samassa liikeradassa: jarrutus, pito, työntö.</td></tr>
-        <tr><th scope="row">Stressi</th><td>Negatiivinen kuorma, jota hallitaan ja minimoidaan.</td><td>Oikein annosteltuna kehityksen ehto. Palautumista säädetään yksilöllisesti hermoston tilan mukaan.</td></tr>
-        <tr><th scope="row">Painopiste</th><td>Kuinka paljon kuormitusta?</td><td>Miten voima tuotetaan? Katse on liikkeen laadussa ja hermostollisessa hallinnassa.</td></tr>
+        <tr><th scope="row">Lähtökohta</th><td>Fysiologia ja mittarit. Ominaisuuksia kehitetään pääosin erikseen.</td><td>Liike ja hermosto. Keho nähdään kokonaisuutena: faskia, selkäranka ja hermosto yhdessä.</td></tr>
+        <tr><th scope="row">Harjoittelu</th><td>Jaksotettu. Voima, nopeus ja kestävyys omina harjoitusblokkeinaan.</td><td>Integroitu ja rytmitetty. Nopeus, voima ja koordinaatio kehitetään samassa liikeradassa: jarrutus, pito, työntö.</td></tr>
+        <tr><th scope="row">Stressi</th><td>Kuormitus, jota hallitaan ja josta palaudutaan suunnitellusti.</td><td>Oikein annosteltuna kehityksen ehto. Palautumista säädetään yksilöllisesti hermoston tilan mukaan.</td></tr>
+        <tr><th scope="row">Painopiste</th><td>Kuinka paljon voimaa ja kuormitusta?</td><td>Miten voima tuotetaan? Katse on liikkeen laadussa ja hermostollisessa hallinnassa.</td></tr>
       </tbody>
     </table>
     <p class="footnote">
@@ -381,10 +403,131 @@
     </p>
   </section>
 
-  <!-- ================= 05 tekijät ================= -->
+  <!-- ================= 05 case ================= -->
+  <section class="sec" id="case">
+    <header class="sec-mark">
+      <span class="no">05 · Case</span>
+      <h2>Mitä tapahtuu, kun harjoittelu muuttuu?</h2>
+    </header>
+
+    <p class="sec-intro">
+      U20-tason pelaaja harjoitteli SBAQ-valmennuksessa keväällä 2026 noin kolme kuukautta,
+      ja testitulokset kehittyivät selvästi. Kesän hän harjoitteli seuransa omalla ohjelmalla
+      ilman SBAQ:ta. Syyskuun alun testeissä useat keväällä nousseet mittarit olivat laskeneet
+      kevään tasosta, kun samaan aikaan SBAQ-ryhmän muut pelaajat olivat menneet eteenpäin.
+      Pelaaja palasi SBAQ-harjoitteluun seuraharjoittelun rinnalle, ja 16 päivää myöhemmin
+      testattiin uudelleen.
+    </p>
+
+    <ol class="story four case-time">
+      <li><b>Helmi-huhtikuu 2026</b><span>Pelikausi ja SBAQ-harjoittelu rinnakkain. Kuusi testikertaa, kevennyshypyn keskiarvo 48,7 cm ja paras 51,6 cm.</span></li>
+      <li><b>Touko-elokuu 2026</b><span>Seuran oma kesäohjelma, ei SBAQ-harjoittelua. Maksimivoima kehittyi, nopeaa voimantuottoa ei harjoitettu erikseen.</span></li>
+      <li><b>5.9.2026</b><span>Kesän jälkeinen lähtötaso: kevennyshyppy 48,8 cm, staattinen hyppy 44,4 cm. SBAQ käynnistyy uudelleen seuraharjoittelun rinnalla.</span></li>
+      <li><b>21.9.2026</b><span>Kaksoistesti 16 päivän SBAQ-jakson jälkeen: kevennyshyppy 52,4 cm, koko sarjan paras. Sama testi toistettiin 45 minuutin kovan treenin jälkeen.</span></li>
+    </ol>
+
+    <div class="case">
+      <figure class="case-chart">
+        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="case-chart-title" font-family="Archivo, Helvetica, Arial, sans-serif">
+        <title id="case-chart-title">Kevennyshypyn kehitys kesästä 2025 syyskuuhun 2026. Kevään SBAQ-jaksolla nousu 51,6 senttiin, kesän jälkeen 48,8 ja 16 päivän SBAQ-jakson jälkeen 52,4 senttiä.</title>
+        <rect x="115.5" y="26" width="454.3" height="230" fill="rgba(226,82,29,.07)"/>
+        <text x="342.6" y="246" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#e2521d">SBAQ KEVÄT</text>
+        <rect x="569.7" y="26" width="90.8" height="230" fill="rgba(19,20,22,.045)"/>
+        <text x="615.1" y="246" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#8b8d92">KESÄ</text>
+        <rect x="660.5" y="26" width="69.5" height="230" fill="rgba(226,82,29,.07)"/>
+        <text x="695.3" y="246" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, Menlo, monospace" letter-spacing=".08em" fill="#e2521d">SBAQ</text>
+        <line x1="46" y1="256.0" x2="730" y2="256.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="260.0" text-anchor="end" font-size="12" fill="#73767b">46</text>
+        <line x1="46" y1="223.1" x2="730" y2="223.1" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="227.1" text-anchor="end" font-size="12" fill="#73767b">47</text>
+        <line x1="46" y1="190.3" x2="730" y2="190.3" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="194.3" text-anchor="end" font-size="12" fill="#73767b">48</text>
+        <line x1="46" y1="157.4" x2="730" y2="157.4" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="161.4" text-anchor="end" font-size="12" fill="#73767b">49</text>
+        <line x1="46" y1="124.6" x2="730" y2="124.6" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="128.6" text-anchor="end" font-size="12" fill="#73767b">50</text>
+        <line x1="46" y1="91.7" x2="730" y2="91.7" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="95.7" text-anchor="end" font-size="12" fill="#73767b">51</text>
+        <line x1="46" y1="58.9" x2="730" y2="58.9" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="62.9" text-anchor="end" font-size="12" fill="#73767b">52</text>
+        <line x1="46" y1="26.0" x2="730" y2="26.0" stroke="#d6d3ca" stroke-width="1"/>
+        <text x="38" y="30.0" text-anchor="end" font-size="12" fill="#73767b">53</text>
+        <text x="38" y="18" text-anchor="end" font-size="11" fill="#73767b">cm</text>
+        <polyline points="70.0,187.0 160.9,187.0 251.7,170.6 342.6,187.0 433.4,213.3 524.3,72.0 615.1,164.0 706.0,45.7" fill="none" stroke="#131416" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="70.0" cy="187.0" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="70.0" y="175.0" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,1</text>
+        <text x="70.0" y="278" text-anchor="middle" font-size="12" fill="#44474c">kesä 2025</text>
+        <circle cx="160.9" cy="187.0" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="160.9" y="175.0" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,1</text>
+        <text x="160.9" y="278" text-anchor="middle" font-size="12" fill="#44474c">6.2.</text>
+        <circle cx="251.7" cy="170.6" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="251.7" y="158.6" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,6</text>
+        <text x="251.7" y="278" text-anchor="middle" font-size="12" fill="#44474c">7.3.</text>
+        <circle cx="342.6" cy="187.0" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="342.6" y="175.0" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">48,1</text>
+        <text x="342.6" y="278" text-anchor="middle" font-size="12" fill="#44474c">11.3.</text>
+        <circle cx="433.4" cy="213.3" r="4.5" fill="#131416" stroke="#fff" stroke-width="2"/>
+        <text x="433.4" y="233.3" text-anchor="middle" font-size="12.5" font-weight="500" fill="#131416">47,3</text>
+        <text x="433.4" y="278" text-anchor="middle" font-size="12" fill="#44474c">8.4.</text>
+        <circle cx="524.3" cy="72.0" r="6" fill="#e2521d" stroke="#fff" stroke-width="2"/>
+        <text x="524.3" y="60.0" text-anchor="middle" font-size="12.5" font-weight="700" fill="#e2521d">51,6</text>
+        <text x="524.3" y="278" text-anchor="middle" font-size="12" fill="#44474c">23.4.</text>
+        <circle cx="615.1" cy="164.0" r="6" fill="#73767b" stroke="#fff" stroke-width="2"/>
+        <text x="615.1" y="184.0" text-anchor="middle" font-size="12.5" font-weight="700" fill="#131416">48,8</text>
+        <text x="615.1" y="278" text-anchor="middle" font-size="12" fill="#44474c">5.9.</text>
+        <circle cx="706.0" cy="45.7" r="6" fill="#e2521d" stroke="#fff" stroke-width="2"/>
+        <text x="706.0" y="33.7" text-anchor="middle" font-size="12.5" font-weight="700" fill="#e2521d">52,4</text>
+        <text x="706.0" y="278" text-anchor="middle" font-size="12" fill="#44474c">21.9.</text>
+        </svg>
+        <figcaption><span>Kevennyshyppy, kahdella jalalla</span> Mattotesti, kahdeksan testipäivää kesästä 2025 syyskuuhun 2026. Huhtikuun puolivälin testi on jätetty pois mittausvirheen vuoksi, ja 21.9. näytetään treeniä edeltävä tulos. Asteikko alkaa 46 cm:stä. Molemmat huiput osuvat SBAQ-jaksoihin.</figcaption>
+      </figure>
+
+      <ul class="case-stats">
+        <li><i>Kevään keskiarvo → kesän jälkeen</i><b class="down">+0,2 %</b><span>48,7 → 48,8 cm. Neljä kuukautta seuran ohjelmalla, hyppytulos ei liikkunut. Kevään paras 51,6 cm jäi taakse.</span></li>
+        <li><i>16 päivää SBAQ:ta</i><b>+7,3 %</b><span>48,8 → 52,4 cm, koko sarjan paras. Staattinen hyppy nousi samalla 6,3 %.</span></li>
+        <li><i>45 min kovan treenin jälkeen</i><b>+5,6 %</b><span>Staattinen hyppy 47,2 → 49,8 cm samana päivänä. Yksikään tulos ei laskenut, eli kuormitus oli oikein annosteltu.</span></li>
+      </ul>
+    </div>
+
+    <div class="case-read">
+      <p class="q-label">Mitä tämä kertoo</p>
+      <div>
+        <p>
+          Kuusitoista päivää on liian lyhyt aika lihaskasvulle. Muutos on hermostollinen ja
+          elastinen: järjestelmä oppi käyttämään voimaa, jonka kesän voimaharjoittelu oli jo
+          rakentanut. Kesä rakensi, SBAQ realisoi. Voima ja sen nopea ilmaisu ovat eri
+          ominaisuuksia, ja paras tulos syntyy, kun molempia harjoitetaan rinnakkain.
+        </p>
+        <p>
+          Toinen havainto koskee kuormitusta. Hyppytuloksen nousu heti harjoituksen jälkeen
+          on tunnettu aktivaatioilmiö, jonka hyvä lämmittelykin tuottaa. Olennaista on, ettei
+          45 minuutin kova harjoitus painanut yhtäkään tulosta alaspäin: toistot ovat lyhyitä
+          ja palautukset täydet, joten annostelu sopii pelikauteen eikä kuluta jalkoja peleihin.
+        </p>
+      </div>
+    </div>
+
+    <ol class="story four case-loop">
+      <li><b>Testaa</b><span>Sama testi, sama menetelmä, sama testaaja. Vain silloin sarjaa voi verrata.</span></li>
+      <li><b>Analysoi</b><span>Mikä muuttui, kuinka paljon ja onko muutos suurempi kuin mittauksen vaihtelu.</span></li>
+      <li><b>Harjoittele</b><span>Harjoittelua muutetaan datan perusteella, ei tuntuman.</span></li>
+      <li><b>Testaa uudelleen</b><span>Emme halua tietää vain, kuinka paljon urheilija harjoittelee. Haluamme mitata, mitä harjoittelu tekee hänelle.</span></li>
+    </ol>
+
+    <p class="footnote">
+      Yksi pelaaja ei ole tutkimus, ja kauden alku muutti samalla seuran kuormitusta:
+      harjoitusvolyymi laski ja pelit alkoivat. Osa noususta voi selittyä tällä, eikä SBAQ:n
+      osuutta voi erottaa täysin ilman verrokkia. Muutos on kuitenkin selvästi mattotestin
+      tyypillistä vaihtelua (2-4 %) suurempi ja toistui kahdessa testissä samana päivänä.
+      Pelaajan nimi ja seura on jätetty pois. Testit: mattotesti, kevennyshyppy (CMJ) ja
+      staattinen hyppy (SJ) kahdella ja yhdellä jalalla.
+    </p>
+  </section>
+
+  <!-- ================= 06 tekijät ================= -->
   <section class="sec" id="tekijat">
     <header class="sec-mark">
-      <span class="no">05 · Tekijät</span>
+      <span class="no">06 · Tekijät</span>
       <h2>Kolme valmentajaa, laaja tausta</h2>
     </header>
 
@@ -415,15 +558,15 @@
 
     <p class="footnote">
       Emme tee tätä yksin. Yhteistyössä ovat mukana Suomen johtavia taitoluisteluvalmentajia,
-      eliittitason CrossFit-urheilijoita ja suuri kansainvälinen Sport Lab, jonka kanssa
+      eliittitason CrossFit-urheilijoita ja kansainvälinen urheilulaboratorio, jonka kanssa
       kehitämme uusia testejä ja testauslaitteita.
     </p>
   </section>
 
-  <!-- ================= 06 tilanne ================= -->
+  <!-- ================= 07 tilanne ================= -->
   <section class="sec" id="tilanne">
     <header class="sec-mark">
-      <span class="no">06 · Tilanne</span>
+      <span class="no">07 · Tilanne</span>
       <h2>Missä mennään?</h2>
     </header>
 
@@ -486,17 +629,28 @@
       Palvelua kehitetään yhdessä seurojen kanssa. Jos haluat kokeilla työkalua oman
       joukkueesi testituloksilla, kirjoita:
     </p>
-    <a class="end-mail" href="mailto:gora.salo@gmail.com">gora.salo@gmail.com</a>
+    <a class="end-mail" href="mailto:info@sbaq.fi">info@sbaq.fi</a>
+    <dl class="end-card">
+      <div><dt>Yritys</dt><dd>SBAQ Academy Oy<br>Y-tunnus 3312345-3<br>Tampere</dd></div>
+      <div><dt>Seurayhteistyö ja myynti</dt><dd><a href="tel:+358505550123">+358 50 555 0123</a><br><a href="mailto:info@sbaq.fi">info@sbaq.fi</a></dd></div>
+      <div><dt>Valmennus ja testaus</dt><dd><a href="tel:+358405550187">+358 40 555 0187</a><br><a href="mailto:valmennus@sbaq.fi">valmennus@sbaq.fi</a></dd></div>
+    </dl>
+    <p class="end-note">
+      Yhteystiedot ovat demon esimerkkitietoja. Demo ei tallenna mitään palvelimelle:
+      testidata on sivun mukana tuleva pseudonymisoitu esimerkkiaineisto, eikä sivu
+      käytä evästeitä tai analytiikkaa. Seurojen omaa dataa käsitellään vasta
+      tallennuksen ja kirjautumisen valmistuttua.
+    </p>
     </div>
   </div>
   <div class="end-base">
     <span class="wordmark small">SBAQ</span>
-    <span>SBAQ Academy · Speed · Balance · Agility · Quickness</span>
-    <a href="app/kirjaudu.html">Työkalu</a>
+    <span>SBAQ Academy Oy · Speed · Balance · Agility · Quickness</span>
+    <a href="app/kirjaudu.html">Katso demo</a>
     <a href="#top">Sivun alkuun</a>
   </div>
 </footer>
 
-<script src="site.js?v=20260917x"></script>
+<script src="site.js?v=20260922c"></script>
 </body>
 </html>
