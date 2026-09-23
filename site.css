@@ -83,6 +83,7 @@ h1 i { font-style: normal; color: var(--tape-2); }
 .go:hover::after, .mast-tool:hover::after { transform: translateX(3px); }
 .under { font-weight: 600; font-size: 15px; text-underline-offset: 5px; text-decoration-thickness: 1px; }
 .under:hover { color: var(--tape-2); }
+.hero-sub { margin-top: 14px; font: 500 12.5px/1.5 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tape-2); }
 .hero-offer { margin-top: 18px; max-width: 34em; font-size: 15.5px; line-height: 1.55; color: #c9c8c3; border-left: 2px solid var(--tape); padding-left: 14px; }
 .hero-note { margin-top: 28px; font: 400 12px/1.5 var(--f-mono); color: #a2a4a9; }
 
@@ -239,6 +240,7 @@ table { border-collapse: collapse; width: 100%; }
 .names li:last-child { border-bottom: 1px solid var(--hair); }
 .names b { flex: none; width: 52px; height: 52px; display: grid; place-items: center; background: var(--ink); color: #fff; font: 500 14px/1 var(--f-mono); letter-spacing: .06em; }
 .names span { font-size: clamp(20px, 2vw, 25px); font-weight: 800; font-stretch: 95%; }
+.names small { display: block; font-size: 14px; font-weight: 400; font-stretch: 100%; color: var(--gray); margin-top: 2px; }
 .exp ul { border-top: 1px solid var(--ink); }
 .exp li { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; padding: 13px 0 14px; border-bottom: 1px solid var(--hair); }
 .exp li b { font-size: 15.5px; font-weight: 700; }
