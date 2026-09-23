@@ -313,6 +313,23 @@ table { border-collapse: collapse; width: 100%; }
 .sub-head .lead { margin-top: 18px; max-width: 40em; font-size: 17.5px; color: var(--ink-2); }
 .sub-head .dateline { color: var(--tape); }
 
+/* referenssit */
+.refs { margin-top: 40px; display: grid; grid-template-columns: 15% 1fr; align-items: start; }
+.refs .q-label { margin: 0; }
+.refs-line { max-width: 46em; font-size: 16px; line-height: 1.6; color: var(--ink-2); }
+.refs-line b { color: var(--ink); }
+
+/* toistettava räjähtävyys */
+.dark .story b { color: var(--tape-2); }
+.dark .story span { color: var(--night-text); }
+.snap-steps { margin-top: 44px; }
+.snap-phases { margin-top: 64px !important; }
+.snap-phases > div { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--night-hair); }
+.snap-phases > div > div { padding: 24px 28px 26px; }
+.snap-phases > div > div + div { border-left: 1px solid var(--night-hair); box-shadow: inset 3px 0 0 var(--tape); }
+.snap-phases h3 { font-size: 19px; font-weight: 800; }
+.snap-phases > div p { margin-top: 10px; font-size: 15px; line-height: 1.55; color: var(--night-text); }
+
 /* case: yksi pelaaja, kolme jaksoa */
 .story.four { grid-template-columns: repeat(4, 1fr); gap: 28px; }
 .case-time { margin-top: 44px; }
@@ -389,6 +406,9 @@ table { border-collapse: collapse; width: 100%; }
   .equip > div, .equip > div + div { padding: 24px 0 8px; border-left: 0; }
   .equip > div + div { border-top: 1px solid var(--ink); margin-top: 24px; }
   .case-read { grid-template-columns: 1fr; row-gap: 8px; }
+  .refs { grid-template-columns: 1fr; row-gap: 8px; }
+  .snap-phases > div { grid-template-columns: 1fr; }
+  .snap-phases > div > div + div { border-left: 0; border-top: 1px solid var(--night-hair); box-shadow: inset 0 3px 0 var(--tape); }
   .case-chart { padding: 10px 8px 10px; }
   .whom { grid-template-columns: 1fr; row-gap: 8px; }
   .whom-note { grid-column: 1; }
